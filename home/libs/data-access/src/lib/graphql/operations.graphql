@@ -1,0 +1,31 @@
+query setList {
+  allSets{
+    id
+    name
+    numParts
+    year
+  }
+}
+
+query whoAmI {
+  whoAmI {
+    ID
+    Login
+    Email
+    Status
+    Role
+    Profile {
+      ID
+      Description
+    }
+  }
+}
+
+mutation addSet($name: String!, $year: String!, $numParts: Int!) {
+  addSet(name: $name, year: $year, numParts: $numParts) {
+    id
+    name
+    numParts
+    year
+  }
+}

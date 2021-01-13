@@ -1,0 +1,30 @@
+type Set {
+  id: Int!
+  name: String
+  year: Int
+  numParts: Int
+}
+
+type Profile {
+  ID: Int!
+  Name: String
+  Description: String
+}
+
+type User {
+  ID: Int!
+  Login: String
+  Email: String
+  Status: Int
+  Role: String
+  Profile: Profile
+}
+
+type Query {
+  allSets: [Set]
+  whoAmI: User
+}
+
+type Mutation {
+  addSet(name: String, year: String, numParts: Int): Set
+}
