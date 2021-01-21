@@ -36,7 +36,10 @@
     "data-access": {
       "tags": []
     },
-    "feature-sets": {
+    "ui": {
+      "tags": []
+    },
+    "feature-peripherals-list": {
       "tags": []
     }
   }

@@ -4,6 +4,7 @@ module.exports = {
     '<rootDir>/apps/backend-iot',
     '<rootDir>/apps/api',
     '<rootDir>/libs/data-access',
-    '<rootDir>/libs/feature-sets',
+    '<rootDir>/libs/ui',
+    '<rootDir>/libs/feature-peripherals/list',
   ],
 };

@@ -182,22 +182,45 @@
         }
       }
     },
-    "feature-sets": {
-      "root": "libs/feature-sets",
-      "sourceRoot": "libs/feature-sets/src",
+    "ui": {
+      "root": "libs/ui",
+      "sourceRoot": "libs/ui/src",
       "projectType": "library",
       "schematics": {},
       "architect": {
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/feature-sets/**/*.{ts,tsx,js,jsx}"]
+            "lintFilePatterns": ["libs/ui/**/*.{ts,tsx,js,jsx}"]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
           "options": {
-            "jestConfig": "libs/feature-sets/jest.config.js",
+            "jestConfig": "libs/ui/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "feature-peripherals-list": {
+      "root": "libs/feature-peripherals/list",
+      "sourceRoot": "libs/feature-peripherals/list/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/feature-peripherals/list/**/*.{ts,tsx,js,jsx}"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/feature-peripherals/list/jest.config.js",
             "passWithNoTests": true
           }
         }

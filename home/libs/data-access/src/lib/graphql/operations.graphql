@@ -1,11 +1,3 @@
-query setList {
-  allSets{
-    id
-    name
-    numParts
-    year
-  }
-}
 
 query whoAmI {
   whoAmI {
@@ -16,6 +8,7 @@ query whoAmI {
     Role
     Profile {
       ID
+      Name
       Description
     }
   }
