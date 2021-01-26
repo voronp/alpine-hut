@@ -19,17 +19,18 @@ export function App() {
   const isAuthenticated = useSelector(state => getAuthState(state).isAuthenticated)
   const isAuthLoading = useSelector(state => getAuthState(state).loadingStatus)
   const loginError = useSelector(state => getAuthState(state).error)
+  const {data, error: authError, loading, refetch: refetchWhoAmI} = useWhoAmIQuery()
 
   useEffect(() => {
     refetchWhoAmI()
-  }, [isAuthenticated])
+  }, [isAuthenticated, data])
 
-  const {data, error: authError, loading, refetch: refetchWhoAmI} = useWhoAmIQuery()
+
 
   const headerProps:HeaderProps = {
     onLogout: () => dispatch(logoutThunk()),
     onLogin: (login, password) => dispatch(loginThunk({login, password})),
-    isAuthenticated,
+    isAuthenticated: isAuthenticated && !!data,
     isAuthLoading: isAuthLoading === 'loading',
     authUserName: data?.whoAmI?.Login,
     authError: loginError,

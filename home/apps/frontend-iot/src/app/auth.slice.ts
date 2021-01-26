@@ -6,6 +6,7 @@ import {
 } from '@reduxjs/toolkit';
 
 import {api, AuthResponse} from "./api";
+import {saveToken} from './token'
 
 export const AUTH_FEATURE_KEY = 'auth';
 
@@ -15,8 +16,6 @@ export interface AuthState {
   currentRequestId: unknown;
   error: string;
 }
-
-//export const authAdapter = createEntityAdapter<AuthEntity>();
 
 /**
  * Export an effect using createAsyncThunk from
@@ -80,9 +79,15 @@ export const authSlice = createSlice({
       .addCase(
         loginThunk.fulfilled,
         (state: AuthState, action: PayloadAction<AuthResponse>) => {
-          window.localStorage.setItem('id_token', action.payload.access_token)
-          state.isAuthenticated = true;
-          state.loadingStatus = 'loaded';
+          if(action.payload.access_token) {
+            saveToken(action.payload.access_token)
+            state.isAuthenticated = true;
+            state.loadingStatus = 'loaded';
+          } else if(action.payload.statusCode === 401) {
+            state.isAuthenticated = false;
+            state.loadingStatus = 'error';
+            state.error = 'Wrong credentials'
+          }
         }
       )
       .addCase(loginThunk.rejected, (state: AuthState, action) => {
@@ -95,7 +100,7 @@ export const authSlice = createSlice({
       .addCase(
         logoutThunk.fulfilled,
         (state: AuthState) => {
-          window.localStorage.setItem('id_token', '')
+          saveToken('')
           state.isAuthenticated = false;
           state.loadingStatus = 'loaded';
         }

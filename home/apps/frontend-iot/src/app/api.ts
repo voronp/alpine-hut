@@ -1,6 +1,9 @@
 import { environment } from '../environments/environment';
+import {readToken} from './token'
 
 export type AuthResponse = {
+  statusCode?: number;
+  message?: string,
   access_token: string,
 }
 
@@ -19,7 +22,12 @@ class Api implements IApi {
     this.baseUrl = baseUrl
   }
   get<T>(url:string):Promise<T> {
-    return window.fetch(this.baseUrl+url).then(res => res.json())
+    const token = readToken()
+    return window.fetch(this.baseUrl+url, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      }
+    }).then(res => res.json())
   }
   post<T>(url, data):Promise<T> {
     return window.fetch(this.baseUrl+url, data).then(res => res.json())

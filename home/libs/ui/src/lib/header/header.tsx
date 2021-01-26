@@ -1,6 +1,8 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Toolbar, ToolbarProps} from 'primereact/toolbar';
 import {Button, ButtonProps} from 'primereact/button';
+import {ConfirmPopup, confirmPopup} from 'primereact/confirmpopup';
+import { Toast } from 'primereact/toast';
 import {Dialog} from "primereact/dialog";
 import { Password } from 'primereact/password';
 import { InputText } from 'primereact/inputtext';
@@ -9,8 +11,6 @@ import './header.scss';
 const leftContents = (props) => (
   <React.Fragment>
     <div className="main-title">Alpine Hut</div>
-    <Button label="3d view" icon="pi pi-home" className="p-d-sm-block p-d-none" />
-    <Button label="List" icon="pi pi-list" className="p-d-sm-block p-d-none" />
   </React.Fragment>
 );
 
@@ -28,16 +28,32 @@ export interface HeaderProps {
 
 
 export function AppHeader({onLogin, onLogout, isAuthenticated, isAuthLoading, authUserName, authError}: HeaderProps) {
-
+  const toast = useRef()
+  useEffect(() => {
+    if(authError && toast.current !== undefined) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      toast.current.show({severity: 'error', summary: 'Login failed', detail: authError});
+    }
+  }, [authError])
+  const [logoutConfirmVisible, setLogoutConfirmVisible] = useState(false)
   const [userName, setUserName] = useState('')
   const [userPassword, setUserPassword] = useState('')
   const rightContents = (p) => {
     return (<React.Fragment>
-      <Button icon={"pi "+(isAuthLoading ? ' pi-spin pi-spinner ' : isAuthenticated ? ' pi-sign-out' : ' pi-user')} className="p-mr-2" label={authUserName || ''}/>
+      <Button label="3d view" icon="pi pi-home" className="p-d-sm-block p-d-none" />
+      <Button label="List" icon="pi pi-list" className="p-d-sm-block p-d-none" />
+      <Button
+        icon={"pi "+(isAuthLoading ? ' pi-spin pi-spinner ' : isAuthenticated ? ' pi-sign-out' : ' pi-user')}
+        className="p-mr-2"
+        label={isAuthenticated ? authUserName || '' : ''}
+        onClick={() => setLogoutConfirmVisible(true)}
+      />
       <Button icon="pi pi-bars" className="p-d-sm-none p-mr-2 p-d-block"/>
     </React.Fragment>)
   };
   return (<>
+      <Toast ref={toast} />
       <Dialog
         closable={false}
         header="Please sign in"
@@ -65,6 +81,15 @@ export function AppHeader({onLogin, onLogout, isAuthenticated, isAuthLoading, au
               <Password value={userPassword} onChange={(e) => setUserPassword((e.target as HTMLInputElement).value)} feedback={false} />
           </div>
       </Dialog>
+      <ConfirmPopup
+        target={document.querySelector('.pi-sign-out')}
+        visible={logoutConfirmVisible}
+        onHide={() => setLogoutConfirmVisible(false)}
+        message="Are you sure you want to logout?"
+        icon="pi pi-exclamation-triangle"
+        accept={onLogout}
+        reject={() => setLogoutConfirmVisible(false)}
+      />
     <Toolbar left={leftContents} right={rightContents} className="header-toolbar" />
     </>
   );

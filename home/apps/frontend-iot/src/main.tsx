@@ -11,6 +11,7 @@ import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 
 import { AUTH_FEATURE_KEY, authReducer } from './app/auth.slice';
+import {readToken} from './app/token'
 
 import { BrowserRouter } from 'react-router-dom';
 
@@ -20,7 +21,7 @@ const httpLink = createHttpLink({
 
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
-  const token = localStorage.getItem('id_token');
+  const token = readToken();
   // return the headers to the context so httpLink can read them
   return {
     headers: {

@@ -16,6 +16,14 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('auth/logout')
+  async logout(@Request() req) {
+    console.log('logout', req.user)
+    return {result: true}
+    //return this.authService.(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
