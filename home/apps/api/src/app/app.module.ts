@@ -1,15 +1,18 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import GraphQLJSON from 'graphql-type-json';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SetResolver } from './set.resolver';
 import {UsersResolver} from '../users/users.resolver'
 
 import {environment} from '../environments/environment'
 import {AuthModule} from "../auth/auth.module";
 import {join} from "path";
+import {CommonModule} from "../common/common.module";
+import {PeripheralGroupsResolver} from "../peripheral-groups/peripheral-groups.resolver";
+import {PeripheralGroupsModule} from "../peripheral-groups/peripheral-groups.module";
 
 @Module({
   imports: [
@@ -29,11 +32,15 @@ import {join} from "path";
     GraphQLModule.forRoot({
       typePaths: ['./**/*.graphql'],
       installSubscriptionHandlers: true,
-
+      resolvers: {
+        JSON: GraphQLJSON,
+      },
     }),
     AuthModule,
+    CommonModule,
+    PeripheralGroupsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, SetResolver, UsersResolver],
+  providers: [AppService, UsersResolver, PeripheralGroupsResolver],
 })
 export class AppModule {}

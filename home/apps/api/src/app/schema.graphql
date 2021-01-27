@@ -1,8 +1,10 @@
-type Set {
-  id: Int!
-  name: String
-  year: Int
-  numParts: Int
+scalar JSON
+scalar Date
+
+type Position {
+  x: Float
+  y: Float
+  Z: Float
 }
 
 type Profile {
@@ -21,10 +23,31 @@ type User {
 }
 
 type Query {
-  allSets: [Set]
   whoAmI: User
+  peripheralGroupList: [PeripheralGroup]
 }
 
 type Mutation {
-  addSet(name: String, year: String, numParts: Int): Set
+  addPeripheralGroup(ID: Int!, Name: String, Data: JSON, Description: String, Type: String): PeripheralGroup
+}
+
+type Peripheral {
+  ID: Int!
+  Name: String
+  Data: JSON
+  Type: String
+  Description: String
+  IsActieve: Boolean
+  Interface: String
+  LastUpdate: Date
+  Position: Position
+}
+
+type PeripheralGroup {
+  ID: Int!
+  Name: String
+  Data: JSON
+  Type: String
+  Description: String
+  Peripherals: [Peripheral]
 }

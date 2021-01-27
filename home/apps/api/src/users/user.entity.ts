@@ -7,8 +7,6 @@ export enum UserRole {
   REGULAR = "regular",
 }
 
-console.log(Profile)
-
 @Entity('auth')
 export class User {
   @PrimaryGeneratedColumn()

@@ -6,11 +6,10 @@
 
 /* tslint:disable */
 /* eslint-disable */
-export class Set {
-    id: number;
-    name?: string;
-    year?: number;
-    numParts?: number;
+export class Position {
+    x?: number;
+    y?: number;
+    Z?: number;
 }
 
 export class Profile {
@@ -29,11 +28,34 @@ export class User {
 }
 
 export abstract class IQuery {
-    abstract allSets(): Set[] | Promise<Set[]>;
-
     abstract whoAmI(): User | Promise<User>;
+
+    abstract peripheralGroupList(): PeripheralGroup[] | Promise<PeripheralGroup[]>;
 }
 
 export abstract class IMutation {
-    abstract addSet(name?: string, year?: string, numParts?: number): Set | Promise<Set>;
+    abstract addPeripheralGroup(ID: number, Name?: string, Data?: JSON, Description?: string, Type?: string): PeripheralGroup | Promise<PeripheralGroup>;
 }
+
+export class Peripheral {
+    ID: number;
+    Name?: string;
+    Data?: JSON;
+    Type?: string;
+    Description?: string;
+    IsActieve?: boolean;
+    Interface?: string;
+    LastUpdate?: Date;
+    Position?: Position;
+}
+
+export class PeripheralGroup {
+    ID: number;
+    Name?: string;
+    Data?: JSON;
+    Type?: string;
+    Description?: string;
+    Peripherals?: Peripheral[];
+}
+
+export type JSON = any;
