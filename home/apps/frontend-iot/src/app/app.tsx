@@ -23,7 +23,7 @@ export function App() {
 
   useEffect(() => {
     refetchWhoAmI()
-  }, [isAuthenticated, data])
+  }, [isAuthenticated])
 
 
 

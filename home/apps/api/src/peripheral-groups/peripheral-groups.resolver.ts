@@ -15,6 +15,7 @@ export class PeripheralGroupsResolver {
   @UseGuards(GqlAuthGuard)
   async peripheralGroupList(@CurrentUser() user: User) {
     console.log(user)
+    // for now will not check exact permissions besides user is logged in
     return this.peripheralGroupService.findAll()
   }
 

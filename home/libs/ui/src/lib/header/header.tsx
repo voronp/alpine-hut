@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Toolbar, ToolbarProps} from 'primereact/toolbar';
 import {Button, ButtonProps} from 'primereact/button';
-import {ConfirmPopup, confirmPopup} from 'primereact/confirmpopup';
+import {ConfirmPopup} from 'primereact/confirmpopup';
 import { Toast } from 'primereact/toast';
 import {Dialog} from "primereact/dialog";
 import { Password } from 'primereact/password';
