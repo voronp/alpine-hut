@@ -4,7 +4,7 @@ scalar Date
 type Position {
   x: Float
   y: Float
-  Z: Float
+  z: Float
 }
 
 type Profile {
@@ -28,7 +28,7 @@ type Query {
 }
 
 type Mutation {
-  addPeripheralGroup(ID: Int!, Name: String, Data: JSON, Description: String, Type: String): PeripheralGroup
+  addPeripheralGroup(Name: String!, Data: JSON!, Description: String, Type: String!): PeripheralGroup
 }
 
 type Peripheral {

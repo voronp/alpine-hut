@@ -3,9 +3,10 @@ body {
   padding: 0;
 }
 .main {
-  margin-top: 70px;
+  padding-top: 54px;
   min-height: 100vh;
-
+  padding-bottom: 20px;
+  position: relative;
 }
 .app {
   font-family: sans-serif;
@@ -22,6 +23,9 @@ body {
     padding: 8px;
   }
 }
+.footer {
+  margin-top: -20px;
+}
 
 h1 {
   font-family: sans-serif;
@@ -31,4 +35,5 @@ h1 {
 .flex {
   display: flex;
 }
+
 

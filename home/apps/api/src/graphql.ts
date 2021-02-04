@@ -9,7 +9,7 @@
 export class Position {
     x?: number;
     y?: number;
-    Z?: number;
+    z?: number;
 }
 
 export class Profile {
@@ -34,7 +34,7 @@ export abstract class IQuery {
 }
 
 export abstract class IMutation {
-    abstract addPeripheralGroup(ID: number, Name?: string, Data?: JSON, Description?: string, Type?: string): PeripheralGroup | Promise<PeripheralGroup>;
+    abstract addPeripheralGroup(Name: string, Data: JSON, Description?: string, Type: string): PeripheralGroup | Promise<PeripheralGroup>;
 }
 
 export class Peripheral {

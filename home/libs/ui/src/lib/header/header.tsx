@@ -24,10 +24,12 @@ export interface HeaderProps {
   isAuthLoading: boolean
   authUserName: string
   authError: string
+  onClickList: () => void
+  onClick3D: () => void
 }
 
 
-export function AppHeader({onLogin, onLogout, isAuthenticated, isAuthLoading, authUserName, authError}: HeaderProps) {
+export function AppHeader({onLogin, onLogout, isAuthenticated, isAuthLoading, authUserName, authError, onClick3D, onClickList}: HeaderProps) {
   const toast = useRef()
   useEffect(() => {
     if(authError && toast.current !== undefined) {
@@ -41,8 +43,8 @@ export function AppHeader({onLogin, onLogout, isAuthenticated, isAuthLoading, au
   const [userPassword, setUserPassword] = useState('')
   const rightContents = (p) => {
     return (<React.Fragment>
-      <Button label="3d view" icon="pi pi-home" className="p-d-sm-block p-d-none" />
-      <Button label="List" icon="pi pi-list" className="p-d-sm-block p-d-none" />
+      <Button label="3d view" icon="pi pi-home" className="p-d-sm-block p-d-none" onClick={onClick3D} />
+      <Button label="List" icon="pi pi-list" className="p-d-sm-block p-d-none" onClick={onClickList} />
       <Button
         icon={"pi "+(isAuthLoading ? ' pi-spin pi-spinner ' : isAuthenticated ? ' pi-sign-out' : ' pi-user')}
         className="p-mr-2"
@@ -64,22 +66,39 @@ export function AppHeader({onLogin, onLogout, isAuthenticated, isAuthLoading, au
         }}
         footer={
           <div>
-            <Button label="Confirm" icon="pi pi-check" onClick={() => onLogin(userName, userPassword)} autoFocus />
+            <Button type="submit" label="Confirm" icon="pi pi-check" onClick={() => onLogin(userName, userPassword)}  />
           </div>
         }
       >
+        <form onSubmit={(e) => {onLogin(userName, userPassword); e.preventDefault(); return false;}}>
           <div className="p-inputgroup p-p-1">
               <span className="p-inputgroup-addon">
                   <i className="pi pi-user"/>
               </span>
-              <InputText value={userName} onChange={(e) => setUserName((e.target as HTMLInputElement).value)} placeholder="Login or email" />
+              <InputText
+                name="login"
+                type="text"
+                value={userName}
+                onChange={(e) => setUserName((e.target as HTMLInputElement).value)}
+                placeholder="Login or email"
+                autoFocus
+                autocomplete="on"
+              />
           </div>
           <div className="p-inputgroup p-p-1">
               <span className="p-inputgroup-addon">
                   <i className="pi pi-lock"/>
               </span>
-              <Password value={userPassword} onChange={(e) => setUserPassword((e.target as HTMLInputElement).value)} feedback={false} />
+              <Password
+                name="password"
+                value={userPassword}
+                onChange={(e) => setUserPassword((e.target as HTMLInputElement).value)}
+                feedback={false}
+                autocomplete="on"
+              />
           </div>
+          <input type="submit" style={{display: 'none'}} />
+        </form>
       </Dialog>
       <ConfirmPopup
         target={document.querySelector('.pi-sign-out')}

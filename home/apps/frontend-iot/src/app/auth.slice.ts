@@ -17,31 +17,9 @@ export interface AuthState {
   error: string;
 }
 
-/**
- * Export an effect using createAsyncThunk from
- * the Redux Toolkit: https://redux-toolkit.js.org/api/createAsyncThunk
- *
- * e.g.
- * ```
- * import React, { useEffect } from 'react';
- * import { useDispatch } from 'react-redux';
- *
- * // ...
- *
- * const dispatch = useDispatch();
- * useEffect(() => {
- *   dispatch(fetchAuth())
- * }, [dispatch]);
- * ```
- */
 export const loginThunk = createAsyncThunk<AuthResponse, {login, password}>(
   'auth/login',
   async ({login, password}, thunkAPI) => {
-    /**
-     * Replace this with your custom fetch call.
-     * For example, `return myApi.getAuths()`;
-     * Right now we just return an empty array.
-     */
     return api.login(login, password)
   }
 );
@@ -49,11 +27,6 @@ export const loginThunk = createAsyncThunk<AuthResponse, {login, password}>(
 export const logoutThunk = createAsyncThunk(
   'auth/logout',
   async (_, thunkAPI) => {
-    /**
-     * Replace this with your custom fetch call.
-     * For example, `return myApi.getAuths()`;
-     * Right now we just return an empty array.
-     */
     return api.logout()
   }
 );
