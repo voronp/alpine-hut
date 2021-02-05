@@ -34,7 +34,7 @@ export abstract class IQuery {
 }
 
 export abstract class IMutation {
-    abstract addPeripheralGroup(Name: string, Data: JSON, Description?: string, Type: string): PeripheralGroup | Promise<PeripheralGroup>;
+    abstract addPeripheralGroup(Name: string, Data: JSON, Description?: string, Type?: string): PeripheralGroup | Promise<PeripheralGroup>;
 }
 
 export class Peripheral {
@@ -43,7 +43,7 @@ export class Peripheral {
     Data?: JSON;
     Type?: string;
     Description?: string;
-    IsActieve?: boolean;
+    IsActive?: boolean;
     Interface?: string;
     LastUpdate?: Date;
     Position?: Position;

@@ -28,7 +28,7 @@ type Query {
 }
 
 type Mutation {
-  addPeripheralGroup(Name: String!, Data: JSON!, Description: String, Type: String!): PeripheralGroup
+  addPeripheralGroup(Name: String!, Data: JSON!, Description: String, Type: String): PeripheralGroup
 }
 
 type Peripheral {
@@ -37,7 +37,7 @@ type Peripheral {
   Data: JSON
   Type: String
   Description: String
-  IsActieve: Boolean
+  IsActive: Boolean
   Interface: String
   LastUpdate: Date
   Position: Position

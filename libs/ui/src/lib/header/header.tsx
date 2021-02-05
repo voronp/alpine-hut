@@ -82,7 +82,7 @@ export function AppHeader({onLogin, onLogout, isAuthenticated, isAuthLoading, au
                 onChange={(e) => setUserName((e.target as HTMLInputElement).value)}
                 placeholder="Login or email"
                 autoFocus
-                autocomplete="on"
+                autoComplete="on"
               />
           </div>
           <div className="p-inputgroup p-p-1">
@@ -94,7 +94,7 @@ export function AppHeader({onLogin, onLogout, isAuthenticated, isAuthLoading, au
                 value={userPassword}
                 onChange={(e) => setUserPassword((e.target as HTMLInputElement).value)}
                 feedback={false}
-                autocomplete="on"
+                autoComplete="on"
               />
           </div>
           <input type="submit" style={{display: 'none'}} />
