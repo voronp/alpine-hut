@@ -8,24 +8,28 @@ import './app.scss';
 
 import {Route, Link, useHistory} from 'react-router-dom';
 
-import {PeripheralList} from './peripheral-list/peripheral-list'
-import {View3d} from './view3d/view3d'
-import {loginThunk, logoutThunk, getAuthState} from './auth.slice'
+import {PeripheralList} from './peripheral-list/peripheral-list';
+import {View3d} from './view3d/view3d';
+import {loginThunk, logoutThunk, getAuthState} from './auth.slice';
 
 import {AppHeader, HeaderProps} from '@home/ui';
 import {useWhoAmIQuery} from "@home/data-access";
 
 export function App() {
-  const dispatch = useDispatch()
-  const isAuthenticated = useSelector(state => getAuthState(state).isAuthenticated)
-  const isAuthLoading = useSelector(state => getAuthState(state).loadingStatus)
-  const loginError = useSelector(state => getAuthState(state).error)
-  const {data, error: authError, loading, refetch: refetchWhoAmI} = useWhoAmIQuery()
-  const history = useHistory()
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector(state => getAuthState(state).isAuthenticated);
+  const isAuthLoading = useSelector(state => getAuthState(state).loadingStatus);
+  const loginError = useSelector(state => getAuthState(state).error);
+  const {data, error: authError, loading, refetch: refetchWhoAmI} = useWhoAmIQuery();
+  const history = useHistory();
 
   useEffect(() => {
-    refetchWhoAmI()
-  }, [isAuthenticated])
+    refetchWhoAmI().catch((err) => {
+      if(isAuthenticated) {
+        dispatch(logoutThunk());
+      }
+    });
+  }, [isAuthenticated]);
 
 
 
@@ -33,7 +37,7 @@ export function App() {
     onLogout: () => dispatch(logoutThunk()),
     onLogin: (login, password) => dispatch(loginThunk({login, password})),
     isAuthenticated: isAuthenticated && !!data,
-    isAuthLoading: isAuthLoading === 'loading',
+    isAuthLoading: isAuthLoading === 'loading' || isAuthLoading === 'initial',
     authUserName: data?.whoAmI?.Login,
     authError: loginError,
     onClickList: () => history.push('/list'),

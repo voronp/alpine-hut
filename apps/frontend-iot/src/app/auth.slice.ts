@@ -12,7 +12,7 @@ export const AUTH_FEATURE_KEY = 'auth';
 
 export interface AuthState {
   isAuthenticated: boolean;
-  loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
+  loadingStatus: 'initial' | 'loading' | 'loaded' | 'error';
   currentRequestId: unknown;
   error: string;
 }
@@ -33,7 +33,7 @@ export const logoutThunk = createAsyncThunk(
 
 export const initialAuthState: AuthState = {
   isAuthenticated: !!window.localStorage.getItem('id_token'),
-  loadingStatus: 'not loaded',
+  loadingStatus: 'initial',
   currentRequestId: undefined,
   error: null,
 }

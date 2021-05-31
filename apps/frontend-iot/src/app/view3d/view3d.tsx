@@ -42,7 +42,9 @@ export function View3d(props: View3dProps) {
           <ground name='ground' width={40} height={40} subdivisions={1} receiveShadows={true}>
             <standardMaterial name='groundMat' specularColor={Color3.Black()}  ref={grassMaterial} />
           </ground>
-          <House scene={scene}/>
+          <box name="home_group" position={new Vector3(10, 0, 5)}>
+            <House scene={scene}/>
+          </box>
         </Scene>
       </Engine>
     </div>

@@ -3,7 +3,7 @@ import { fetchAuth, authAdapter, authReducer } from './auth.slice';
 describe('auth reducer', () => {
   it('should handle initial state', () => {
     const expected = authAdapter.getInitialState({
-      loadingStatus: 'not loaded',
+      loadingStatus: 'initial',
       error: null,
     });
 

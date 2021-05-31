@@ -59,7 +59,7 @@ export function AppHeader({onLogin, onLogout, isAuthenticated, isAuthLoading, au
       <Dialog
         closable={false}
         header="Please sign in"
-        visible={!isAuthenticated}
+        visible={!isAuthenticated && !isAuthLoading}
         style={{ width: '300px' }}
         onHide={() => {
           console.log('onHide')
