@@ -19,7 +19,10 @@ const onSceneMounted = (sceneEventArgs) => {
 export function View3d(props: View3dProps) {
 
   const {grassMaterial} = use3DParts(scene)
-
+  const cameraRef = useCallback((camera) => {
+    if(camera)
+      camera.target = new Vector3(10, 2, 10);
+  }, []);
   useEffect(() => {
     if(props.isActive) {
       // hack due to not working recalc aspect ratio
@@ -31,7 +34,7 @@ export function View3d(props: View3dProps) {
     <div className={styles.wrapper} style={{display: props.isActive ? 'initial' : 'none'}}>
       <Engine antialias canvasId='babylonJS' adaptToDeviceRatio={true} canvasStyle={{width: '100%', height: '100%'}} >
         <Scene enableInteractions={true} onSceneMount={onSceneMounted}>
-          <freeCamera  name="camera1" target={new Vector3(-10, 0, -10)} position={new Vector3(10, 10, -20)}/>
+          <freeCamera ref={cameraRef}  name="camera1" rotation={new Vector3(10,-10,10)} position={new Vector3(0, 10, 0)}/>
           <hemisphericLight name='light1' intensity={0.7} direction={Vector3.Up()} />
           <directionalLight name="shadow-light" setDirectionToTarget={[Vector3.Zero()]} direction={Vector3.Zero()} position = {new Vector3(-40, 30, -40)}
                             intensity={0.4} shadowMinZ={1} shadowMaxZ={2500}>

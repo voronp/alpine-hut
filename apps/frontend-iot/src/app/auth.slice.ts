@@ -42,7 +42,9 @@ export const authSlice = createSlice({
   name: AUTH_FEATURE_KEY,
   initialState: initialAuthState,
   reducers: {
-
+    setIsAuthenticated(state, action) {
+      state.isAuthenticated = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder

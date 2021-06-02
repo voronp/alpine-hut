@@ -10,7 +10,7 @@ import {Route, Link, useHistory} from 'react-router-dom';
 
 import {PeripheralList} from './peripheral-list/peripheral-list';
 import {View3d} from './view3d/view3d';
-import {loginThunk, logoutThunk, getAuthState} from './auth.slice';
+import {loginThunk, logoutThunk, getAuthState, authActions} from './auth.slice';
 
 import {AppHeader, HeaderProps} from '@home/ui';
 import {useWhoAmIQuery} from "@home/data-access";
@@ -24,20 +24,22 @@ export function App() {
   const history = useHistory();
 
   useEffect(() => {
-    refetchWhoAmI().catch((err) => {
+    refetchWhoAmI().then((res) => {
+      dispatch(authActions.setIsAuthenticated(true));
+    }).catch((err) => {
       if(isAuthenticated) {
         dispatch(logoutThunk());
       }
     });
   }, [isAuthenticated]);
 
-
+console.log(authActions);
 
   const headerProps:HeaderProps = {
     onLogout: () => dispatch(logoutThunk()),
     onLogin: (login, password) => dispatch(loginThunk({login, password})),
-    isAuthenticated: isAuthenticated && !!data,
-    isAuthLoading: isAuthLoading === 'loading' || isAuthLoading === 'initial',
+    isAuthenticated: isAuthenticated,
+    isAuthLoading: isAuthLoading === 'loading' || (isAuthLoading === 'initial' && loading),
     authUserName: data?.whoAmI?.Login,
     authError: loginError,
     onClickList: () => history.push('/list'),
