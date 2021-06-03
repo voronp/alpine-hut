@@ -507,17 +507,79 @@ export const VerandaRoof = ({scene}) => {
         cap: Mesh.CAP_ALL,
         sideOrientation: Mesh.DOUBLESIDE,
       }, scene);
-      const csgMeshMaterial = new StandardMaterial('material01', scene);
+      const csgMeshMaterial = new StandardMaterial('material02', scene);
       csgMeshMaterial.diffuseColor = Color3.White();
       csgMeshMaterial.specularColor = Color3.Black();
       extruded.material = csgMeshMaterial;
       extruded.position.y += 3;
-      extruded.parent = node
+      extruded.parent = node;
+
+      const rshape = [
+        new Vector3(-3.8,-0.8/3, 0),
+        new Vector3(0,1,0),
+        new Vector3(0,1.2,0),
+        new Vector3(-3.8,-0.8/3+0.2,0),
+      ];
+      rshape.push(rshape[0]);
+      const roof = MeshBuilder.ExtrudeShape("roof-ver", {
+        shape: rshape,
+        path: [
+          new Vector3(0,0,-0.8),
+          new Vector3(0,0,8.8),
+        ],
+        cap: Mesh.CAP_ALL,
+        sideOrientation: Mesh.DOUBLESIDE,
+      }, scene);
+      const roofMaterial = new StandardMaterial('material03', scene);
+      roofMaterial.diffuseColor = Color3.White();
+      roofMaterial.specularColor = Color3.Black();
+      roof.material = roofMaterial;
+      roof.position.y += 3;
+      roof.parent = node
     }
   }, []);
 
   return <mesh ref={ref} name="veranda-roof-group" />
-}
+};
+
+export const MainRoof = ({scene}) => {
+
+  const triangle = [
+    new Vector3(0,0,0),
+    new Vector3(0,1,0),
+    new Vector3(-3,0,0),
+  ];
+  triangle.push(triangle[0]);
+  const ref = useCallback(node => {
+    if(node) {
+
+      const rshape = [
+        new Vector3(-0.6,0,-0.6),
+        new Vector3(3,0,3),
+        new Vector3(6.6,0,-0.6),
+        new Vector3(6.6,0,-0.4),
+        new Vector3(3,0,3.2),
+        new Vector3(-0.6, 0,-0.4),
+      ];
+      rshape.push(rshape[0]);
+      const roof = MeshBuilder.ExtrudePolygon("main-roof", {
+        shape:rshape,
+        depth: 9.6,
+        sideOrientation: Mesh.DOUBLESIDE,
+      }, scene, Earcut);
+      const roofMaterial = new StandardMaterial('material03', scene);
+      roofMaterial.diffuseColor = Color3.White();
+      roofMaterial.specularColor = Color3.Black();
+      roof.material = roofMaterial;
+      roof.rotate(new Vector3(1,0,0), -Math.PI/2);
+      roof.position.y += 4.7;
+      roof.position.z -= 0.8;
+      roof.parent = node
+    }
+  }, []);
+
+  return <mesh ref={ref} name="veranda-roof-group" />
+};
 
 export function House({scene}) {
   return (<>
@@ -530,5 +592,6 @@ export function House({scene}) {
     <Floor3 scene={scene} />
     <Veranda scene={scene}/>
     <VerandaRoof scene={scene}/>
+    <MainRoof scene={scene}/>
     </>)
 }
