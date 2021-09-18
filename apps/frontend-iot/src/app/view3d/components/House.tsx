@@ -1,9 +1,22 @@
-import React, { useCallback, useState, useMemo } from 'react'
-import {Color3, Vector3, CSG, MeshBuilder, StandardMaterial, Scene, Mesh, Color4, BoxBuilder} from "@babylonjs/core";
-
+import React, {useCallback, useState, useMemo, useRef, useEffect, forwardRef, MutableRefObject} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  Color3,
+  Vector3,
+  CSG,
+  MeshBuilder,
+  StandardMaterial,
+  Scene,
+  Mesh,
+  FadeInOutBehavior,
+  BoxBuilder,
+  HighlightLayer
+} from "@babylonjs/core";
+import { usePointer } from '../visualHooks';
 
 import * as Earcut from 'earcut';
 import {Corner, Wall, buildFromPlan} from "../utils3d";
+import {selectHovered, selectSelected} from "../../pointer.slice";
 
 // counter clock vice???
 const floor1Outer = [
@@ -140,9 +153,59 @@ const floor3Inner = [
   ],
 ];
 
-export const Floor1 = ({scene}) => {
+const meshIds = {
+  floor1: 'floor1group',
+  basement: 'basementwall',
+  veranda: 'veranda-group',
+  basement2: 'base2',
+  floor2: 'floor2group',
+  basement3: 'base3group',
+  floor3: 'floor3group',
+  verandaRoof: 'veranda-roof-group',
+  mainRoof: 'main-roof-group',
+};
 
-  const ref = useCallback(node => {
+const viewParts = {
+  floor1: 'floor1Part',
+  floor2: 'floor2Part',
+  floor3: 'floor3Part',
+  veranda: 'verandaPart',
+};
+
+const selectPartMap = {
+  [meshIds.floor1]: viewParts.floor1,
+  [meshIds.floor2]: viewParts.floor2,
+  [meshIds.floor3]: viewParts.floor3,
+  [meshIds.basement]: viewParts.floor1,
+  [meshIds.basement2]: viewParts.floor2,
+  [meshIds.basement3]: viewParts.floor3,
+  [meshIds.veranda]: viewParts.veranda,
+  [meshIds.verandaRoof]: viewParts.veranda,
+  [meshIds.mainRoof]: viewParts.floor3,
+};
+
+const selectPartConfig = {
+  [viewParts.floor1]: {
+    hide: [meshIds.floor3, meshIds.floor2, meshIds.mainRoof, meshIds.basement2, meshIds.basement3],
+    highlight: [meshIds.basement],
+  },
+  [viewParts.floor2]: {
+    hide: [meshIds.floor3, meshIds.mainRoof, meshIds.basement3],
+    highlight: [meshIds.basement2],
+  },
+  [viewParts.floor3]: {
+    hide: [meshIds.mainRoof],
+    highlight: [meshIds.basement3],
+  },
+  [viewParts.veranda]: {
+    hide: [meshIds.verandaRoof],
+    highlight: [meshIds.basement],
+  },
+};
+
+export const Floor1 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
+
+  const cb = useCallback(node => {
     if (node) {
       const ep = MeshBuilder.ExtrudePolygon("polygon", {
         shape:floor1Outer,
@@ -185,23 +248,26 @@ export const Floor1 = ({scene}) => {
       const csgMeshMaterial = new StandardMaterial('material01', scene);
       csgMeshMaterial.diffuseColor = Color3.White();
       csgMeshMaterial.specularColor = Color3.Black();
-      const mesh = res.toMesh('base', csgMeshMaterial, scene, false);
+      const mesh = res.toMesh(meshIds.floor1, csgMeshMaterial, scene, false);
       mesh.position.y += 3;
       window.dispose();
       door1.dispose();
       door2.dispose();
       door3.dispose();
       ep.dispose();
-      mesh.parent = node
+      mesh.parent = node;
+      (ref as MutableRefObject<Mesh>).current = mesh;
     }
   }, []);
-  return <mesh ref={ref} name="floor1group" />
-};
+  usePointer(meshIds.floor1, ref);
+  return <mesh ref={cb} name={`${meshIds.floor1}-container`} />
+});
 
-export const Basement = ({scene}) => {
-
+export const Basement = forwardRef<Mesh, {scene}>(({scene}, ref) => {
+  usePointer(meshIds.basement, ref);
   return <extrudePolygon
-    name='basementwall'
+    ref={ref}
+    name={meshIds.basement}
     earcutInjection={Earcut}
     shape={basementOuter}
     depth={0.5}
@@ -210,10 +276,10 @@ export const Basement = ({scene}) => {
   >
     <standardMaterial name='basementMaterial' diffuseColor={Color3.Gray()} specularColor={Color3.Yellow()} />
   </extrudePolygon>
-};
+});
 
-export const Veranda = ({scene}) => {
-  const ref = useCallback(node => {
+export const Veranda = forwardRef<Mesh, {scene}>(({scene}, ref) => {
+  const cb = useCallback(node => {
     if (node) {
       const ep = MeshBuilder.ExtrudePolygon("polygon", {
         shape: verandaOuter.reverse(),
@@ -245,13 +311,14 @@ export const Veranda = ({scene}) => {
       const csgMeshMaterial = new StandardMaterial('material01', scene);
       csgMeshMaterial.diffuseColor = Color3.White();
       csgMeshMaterial.specularColor = Color3.Black();
-      const mesh = res.toMesh('base', csgMeshMaterial, scene, false);
+      const mesh = res.toMesh(meshIds.veranda, csgMeshMaterial, scene, false);
       mesh.position.y += 3;
       window1.dispose();
       window2.dispose();
       door1.dispose();
       ep.dispose();
-      mesh.parent = node
+      mesh.parent = node;
+      (ref as MutableRefObject<Mesh>).current = mesh;
       verandaFrames.forEach((point, i) => {
         const stick = MeshBuilder.ExtrudePolygon(`veranda-stick${i}`, {
           shape: [
@@ -268,7 +335,8 @@ export const Veranda = ({scene}) => {
       })
     }
   }, []);
-  return <mesh ref={ref} name="veranda-group" >
+  usePointer(meshIds.veranda, ref);
+  return <mesh ref={cb} name={`${meshIds.veranda}-container`} >
     <extrudePolygon
       name='verandastick'
       shape={verandaStick}
@@ -279,12 +347,13 @@ export const Veranda = ({scene}) => {
     >
     <standardMaterial name='verandastickMaterial' diffuseColor={Color3.White()} specularColor={Color3.Black()} />
     </extrudePolygon></mesh>
-};
+});
 
-export const Base2 = ({scene}) => {
-
+export const Base2 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
+  usePointer(meshIds.basement2, ref);
   return <extrudePolygon
-    name='base2'
+    ref={ref}
+    name={meshIds.basement2}
     earcutInjection={Earcut}
     shape={floor2Outer}
     holes={base2Holes}
@@ -294,11 +363,10 @@ export const Base2 = ({scene}) => {
   >
     <standardMaterial name='basementMaterial' diffuseColor={Color3.White()} specularColor={Color3.Black()} />
   </extrudePolygon>
-};
+});
 
-export const Floor2 = ({scene}) => {
-
-  const ref = useCallback(node => {
+export const Floor2 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
+  const cb = useCallback(node => {
     if (node) {
       const ep = MeshBuilder.ExtrudePolygon("polygon", {
         shape:floor2Outer,
@@ -382,21 +450,22 @@ export const Floor2 = ({scene}) => {
       const csgMeshMaterial = new StandardMaterial('material01', scene);
       csgMeshMaterial.diffuseColor = Color3.White();
       csgMeshMaterial.specularColor = Color3.Black();
-      const mesh = res.toMesh('base', csgMeshMaterial, scene, false);
+      const mesh = res.toMesh(meshIds.floor2, csgMeshMaterial, scene, false);
       mesh.position.y += 5.7;
       substract.forEach((s) => {
         s.dispose();
       })
       ep.dispose();
-      mesh.parent = node
+      mesh.parent = node;
+      (ref as MutableRefObject<Mesh>).current = mesh;
     }
   }, []);
-  return <mesh ref={ref} name="floor2group" />
-};
+  usePointer(meshIds.floor2, ref);
+  return <mesh ref={cb} name={`${meshIds.floor2}-container`} />
+});
 
-export const Base3 = ({scene}) => {
-
-  const ref = useCallback(node => {
+export const Base3 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
+  const cb = useCallback(node => {
     if (node) {
       const ep = MeshBuilder.ExtrudePolygon("base3", {
         shape:floor3Outer,
@@ -428,21 +497,22 @@ export const Base3 = ({scene}) => {
       const csgMeshMaterial = new StandardMaterial('material01', scene);
       csgMeshMaterial.diffuseColor = Color3.White();
       csgMeshMaterial.specularColor = Color3.Black();
-      const mesh = res.toMesh('base', csgMeshMaterial, scene, false);
+      const mesh = res.toMesh(meshIds.basement3, csgMeshMaterial, scene, false);
       mesh.position.y += 5.9;
       substract.forEach((s) => {
         s.dispose();
       })
       ep.dispose();
-      mesh.parent = node
+      mesh.parent = node;
+      (ref as MutableRefObject<Mesh>).current = mesh;
     }
   }, []);
-  return <mesh ref={ref} name="base3group" />
-};
+  usePointer(meshIds.basement3, ref);
+  return <mesh ref={cb} name={`${meshIds.basement3}-container`} />
+});
 
-export const Floor3 = ({scene}) => {
-
-  const ref = useCallback(node => {
+export const Floor3 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
+  const cb = useCallback(node => {
     if (node) {
       const ep = MeshBuilder.ExtrudePolygon("polygon", {
         shape:floor3Outer,
@@ -472,23 +542,25 @@ export const Floor3 = ({scene}) => {
       let res;
       substract.forEach((s) => {
         res = (res || csg).subtract(CSG.FromMesh(s));
-      })
+      });
       const csgMeshMaterial = new StandardMaterial('material01', scene);
       csgMeshMaterial.diffuseColor = Color3.White();
       csgMeshMaterial.specularColor = Color3.Black();
-      const mesh = res.toMesh('base', csgMeshMaterial, scene, false);
+      const mesh = res.toMesh(meshIds.floor3, csgMeshMaterial, scene, false);
       mesh.position.y += 7.9;
       substract.forEach((s) => {
         s.dispose();
       })
       ep.dispose();
-      mesh.parent = node
+      mesh.parent = node;
+      (ref as MutableRefObject<Mesh>).current = mesh;
     }
   }, []);
-  return <mesh ref={ref} name="floor3group" />
-};
+  usePointer(meshIds.floor3, ref);
+  return <mesh ref={cb} name={`${meshIds.floor3}-container`} />
+});
 
-export const VerandaRoof = ({scene}) => {
+export const VerandaRoof = forwardRef<Mesh, {scene}>(({scene}, ref) => {
 
   const triangle = [
     new Vector3(0,0,0),
@@ -496,7 +568,7 @@ export const VerandaRoof = ({scene}) => {
     new Vector3(-3,0,0),
   ];
   triangle.push(triangle[0]);
-  const ref = useCallback(node => {
+  const cb = useCallback(node => {
     if(node) {
       const extruded = MeshBuilder.ExtrudeShape("ext", {
         shape: triangle,
@@ -521,7 +593,7 @@ export const VerandaRoof = ({scene}) => {
         new Vector3(-3.8,-0.8/3+0.2,0),
       ];
       rshape.push(rshape[0]);
-      const roof = MeshBuilder.ExtrudeShape("roof-ver", {
+      const roof = MeshBuilder.ExtrudeShape(meshIds.verandaRoof, {
         shape: rshape,
         path: [
           new Vector3(0,0,-0.8),
@@ -535,14 +607,15 @@ export const VerandaRoof = ({scene}) => {
       roofMaterial.specularColor = Color3.Black();
       roof.material = roofMaterial;
       roof.position.y += 3;
-      roof.parent = node
+      roof.parent = node;
+      (ref as MutableRefObject<Mesh>).current = roof;
     }
   }, []);
+  usePointer(meshIds.verandaRoof, ref);
+  return <mesh ref={cb} name={`${meshIds.verandaRoof}-container`} />
+});
 
-  return <mesh ref={ref} name="veranda-roof-group" />
-};
-
-export const MainRoof = ({scene}) => {
+export const MainRoof = forwardRef<Mesh, {scene}>(({scene}, ref) => {
 
   const triangle = [
     new Vector3(0,0,0),
@@ -550,7 +623,8 @@ export const MainRoof = ({scene}) => {
     new Vector3(-3,0,0),
   ];
   triangle.push(triangle[0]);
-  const ref = useCallback(node => {
+  const fader = useRef(new FadeInOutBehavior());
+  const cb = useCallback(node => {
     if(node) {
 
       const rshape = [
@@ -562,7 +636,7 @@ export const MainRoof = ({scene}) => {
         new Vector3(-0.6, 0,-0.4),
       ];
       rshape.push(rshape[0]);
-      const roof = MeshBuilder.ExtrudePolygon("main-roof", {
+      const roof = MeshBuilder.ExtrudePolygon(meshIds.mainRoof, {
         shape:rshape,
         depth: 9.6,
         sideOrientation: Mesh.DOUBLESIDE,
@@ -574,24 +648,62 @@ export const MainRoof = ({scene}) => {
       roof.rotate(new Vector3(1,0,0), -Math.PI/2);
       roof.position.y += 4.7;
       roof.position.z -= 0.8;
-      roof.parent = node
+      roof.parent = node;
+      (ref as MutableRefObject<Mesh>).current = roof;
+      fader.current.attach(roof);
+      fader.current.fadeIn(true);
     }
   }, []);
+  usePointer(meshIds.mainRoof, ref);
+  return <mesh ref={cb} name={`${meshIds.mainRoof}-container`} />
+});
 
-  return <mesh ref={ref} name="veranda-roof-group" />
-};
-
-export function House({scene}) {
+export function House({scene, highlightLayer}) {
+  const partRefs = Object.values(meshIds).reduce((acc, v) => ({...acc, [v]: useRef(null)}), {});
+  const selected = useSelector(selectSelected);
+  const hovered = useSelector(selectHovered);
+  const highlightMesh = (id) => {
+    if(id && partRefs[id].current && highlightLayer.current && !(highlightLayer.current as HighlightLayer).hasMesh(partRefs[id].current)) {
+      highlightLayer.current.addMesh(partRefs[id].current, Color3.Green());
+    }
+    if (!id) {
+      (highlightLayer.current as HighlightLayer).removeAllMeshes();
+    }
+  };
+  useEffect(() => {
+    let highlighted = null;
+    if (hovered && selected !== hovered) {
+      highlighted = selectPartConfig[selectPartMap[hovered]].highlight;
+    }
+    highlightMesh(highlighted);
+    Object.values(meshIds).forEach((meshId) => {
+      if (!partRefs[meshId].current)
+        return;
+      if (selected && selectPartConfig[selectPartMap[selected]].hide.includes(meshId)) {
+        (partRefs[meshId].current as Mesh).isVisible = false;
+        return;
+      }
+      if (hovered && selectPartConfig[selectPartMap[hovered]].hide.includes(meshId)) {
+        (partRefs[meshId].current as Mesh).material.alpha = 0.5;
+        return;
+      }
+      (partRefs[meshId].current as Mesh).isVisible = true;
+      (partRefs[meshId].current as Mesh).material.alpha = 1;
+    })
+  }, [selected, hovered]);
+  //console.log(selected, hovered);
+  //const {isHovered} = usePointer('test', 'test2');
+  //console.log(isHovered);
   return (<>
     <standardMaterial name="homemat" diffuseColor={Color3.FromInts(0,0,0)} alpha={0}/>
-    <Basement scene={scene} />
-    <Floor1 scene={scene}/>
-    <Base2 scene={scene} />
-    <Floor2 scene={scene} />
-    <Base3 scene={scene} />
-    <Floor3 scene={scene} />
-    <Veranda scene={scene}/>
-    <VerandaRoof scene={scene}/>
-    <MainRoof scene={scene}/>
+    <Basement ref={partRefs[meshIds.basement]} scene={scene} />
+    <Floor1 ref={partRefs[meshIds.floor1]} scene={scene}/>
+    <Base2 ref={partRefs[meshIds.basement2]} scene={scene} />
+    <Floor2 ref={partRefs[meshIds.floor2]} scene={scene} />
+    <Base3 ref={partRefs[meshIds.basement3]} scene={scene} />
+    <Floor3 ref={partRefs[meshIds.floor3]} scene={scene} />
+    <Veranda ref={partRefs[meshIds.veranda]} scene={scene}/>
+    <VerandaRoof ref={partRefs[meshIds.verandaRoof]} scene={scene}/>
+    <MainRoof ref={partRefs[meshIds.mainRoof]} scene={scene}/>
     </>)
 }
