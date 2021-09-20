@@ -20,7 +20,8 @@
       "@home/ui": ["libs/ui/src/index.ts"],
       "@home/feature-peripherals/list": [
         "libs/feature-peripherals/list/src/index.ts"
-      ]
+      ],
+      "@assets/*": ["apps/frontend-iot/src/assets/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

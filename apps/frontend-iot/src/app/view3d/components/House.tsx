@@ -1,4 +1,4 @@
-import React, {useCallback, useState, useMemo, useRef, useEffect, forwardRef, MutableRefObject} from 'react';
+import React, {useCallback, useState, useMemo, useRef, useEffect, forwardRef, MutableRefObject, useContext} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Color3,
@@ -8,15 +8,28 @@ import {
   StandardMaterial,
   Scene,
   Mesh,
+  SubMesh,
   FadeInOutBehavior,
   BoxBuilder,
-  HighlightLayer
+  HighlightLayer,
+  Texture,
+  PBRMetallicRoughnessMaterial,
 } from "@babylonjs/core";
 import { usePointer } from '../visualHooks';
 
 import * as Earcut from 'earcut';
 import {Corner, Wall, buildFromPlan} from "../utils3d";
 import {selectHovered, selectSelected} from "../../pointer.slice";
+import roof1Texture from '@assets/textures/TexturesCom_RooftilesTiles0005_1_seamless_S.jpg';
+import floor1Diff from '@assets/textures/TexturesCom_Wood_SidingOutdoor6_2x2_512_albedo.jpg';
+import floor1Normal from '@assets/textures/TexturesCom_Wood_SidingOutdoor6_2x2_512_normal.jpg';
+import wall1Normal from '@assets/textures/TexturesCom_Wood_SidingOutdoor6_2x2_512_normal.jpg';
+import wall1Diff from '@assets/textures/TexturesCom_WoodPlanksClean0087_1_seamless_S.jpg';
+import floor2Diff from '@assets/textures/TexturesCom_Wood_ParquetStrip6_512_albedo.jpg';
+import floor2Rough from '@assets/textures/TexturesCom_Wood_ParquetStrip6_512_roughness.jpg';
+import scifiDiff from '@assets/textures/TexturesCom_Scifi_Panel_512_albedo.jpg';
+import scifiNormal from '@assets/textures/TexturesCom_Scifi_Panel_512_normal.jpg';
+import {SceneContext} from "react-babylonjs";
 
 // counter clock vice???
 const floor1Outer = [
@@ -47,10 +60,17 @@ const floor1Inner = [
 ];
 
 const basementOuter = [
-  new Vector3(-3, 0, 0),
-  new Vector3(-3, 0, 8),
+  new Vector3(0, 0, 0),
+  new Vector3(0, 0, 8),
   new Vector3(6, 0, 8),
   new Vector3(6, 0, 0),
+];
+
+const basementVerandaOuter = [
+  new Vector3(-3, 0, 0),
+  new Vector3(-3, 0, 8),
+  new Vector3(0, 0, 8),
+  new Vector3(0, 0, 0),
 ];
 
 const verandaOuter = [
@@ -138,9 +158,9 @@ const base2Holes = [
 ];
 
 const floor3Outer = [
-  new Vector3(5, 0, 0),
-  new Vector3(5, 0, 8),
-  new Vector3(1, 0, 8),
+  new Vector3(4.98, 0, 0),
+  new Vector3(4.98, 0, 7.98),
+  new Vector3(1, 0, 7.98),
   new Vector3(1, 0, 0),
 ];
 
@@ -156,6 +176,7 @@ const floor3Inner = [
 const meshIds = {
   floor1: 'floor1group',
   basement: 'basementwall',
+  basementVeranda: 'basementVeranda',
   veranda: 'veranda-group',
   basement2: 'base2',
   floor2: 'floor2group',
@@ -180,6 +201,7 @@ const selectPartMap = {
   [meshIds.basement2]: viewParts.floor2,
   [meshIds.basement3]: viewParts.floor3,
   [meshIds.veranda]: viewParts.veranda,
+  [meshIds.basementVeranda]: viewParts.veranda,
   [meshIds.verandaRoof]: viewParts.veranda,
   [meshIds.mainRoof]: viewParts.floor3,
 };
@@ -199,8 +221,92 @@ const selectPartConfig = {
   },
   [viewParts.veranda]: {
     hide: [meshIds.verandaRoof],
-    highlight: [meshIds.basement],
+    highlight: [meshIds.basementVeranda],
   },
+};
+
+export const woodSidingMaterial = ({scene, wAng=null, uScale=null, vScale=null}) => {
+  const csgMeshMaterial = new StandardMaterial('material'+(Math.random()*1000).toFixed(0), scene);
+  csgMeshMaterial.bumpTexture = new Texture(wall1Normal, scene, true, false);
+  csgMeshMaterial.diffuseTexture = new Texture(wall1Diff, scene);
+  const vRatio = 1.6;
+  if (wAng !== null) {
+    (csgMeshMaterial.diffuseTexture as Texture).wAng = wAng;
+    (csgMeshMaterial.bumpTexture as Texture).wAng = wAng;
+  }
+  if (uScale !== null) {
+    (csgMeshMaterial.diffuseTexture as Texture).uScale = uScale;
+    (csgMeshMaterial.bumpTexture as Texture).uScale = uScale;
+  }
+  if (vScale !== null) {
+    (csgMeshMaterial.diffuseTexture as Texture).vScale = vScale * vRatio;
+    (csgMeshMaterial.bumpTexture as Texture).vScale = vScale;
+  } else {
+    (csgMeshMaterial.diffuseTexture as Texture).vScale = vRatio;
+  }
+  csgMeshMaterial.specularColor = Color3.FromInts(55, 55, 0);
+  return csgMeshMaterial
+};
+
+export const woodFloorMaterial = ({scene, wAng=null, uScale=null, vScale=null}) => {
+  const csgMeshMaterial = new StandardMaterial('material'+(Math.random()*1000).toFixed(0), scene);
+  csgMeshMaterial.bumpTexture = new Texture(floor1Normal, scene, true, false);
+  csgMeshMaterial.diffuseTexture = new Texture(floor1Diff, scene);
+  if (wAng !== null) {
+    (csgMeshMaterial.diffuseTexture as Texture).wAng = wAng;
+    (csgMeshMaterial.bumpTexture as Texture).wAng = wAng;
+  }
+  if (uScale !== null) {
+    (csgMeshMaterial.diffuseTexture as Texture).uScale = uScale;
+    (csgMeshMaterial.bumpTexture as Texture).uScale = uScale;
+  }
+  if (vScale !== null) {
+    (csgMeshMaterial.diffuseTexture as Texture).vScale = vScale;
+    (csgMeshMaterial.bumpTexture as Texture).vScale = vScale;
+  }
+  csgMeshMaterial.specularColor = Color3.FromInts(55, 55, 0);
+  return csgMeshMaterial
+};
+
+export const woodParquetMaterial = ({scene, wAng=null, uScale=null, vScale=null}) => {
+  const csgMeshMaterial = new PBRMetallicRoughnessMaterial('material'+(Math.random()*1000).toFixed(0), scene);
+  csgMeshMaterial.metallic = 1;
+  csgMeshMaterial.roughness = 1;
+  csgMeshMaterial.baseTexture = new Texture(floor2Diff, scene);
+  csgMeshMaterial.metallicRoughnessTexture = new Texture(floor2Rough, scene);
+  if (wAng !== null) {
+    (csgMeshMaterial.baseTexture as Texture).wAng = wAng;
+    (csgMeshMaterial.metallicRoughnessTexture as Texture).wAng = wAng;
+  }
+  if (uScale !== null) {
+    (csgMeshMaterial.baseTexture as Texture).uScale = uScale;
+    (csgMeshMaterial.metallicRoughnessTexture as Texture).uScale = uScale;
+  }
+  if (vScale !== null) {
+    (csgMeshMaterial.baseTexture as Texture).vScale = vScale;
+    (csgMeshMaterial.metallicRoughnessTexture as Texture).vScale = vScale;
+  }
+  return csgMeshMaterial;
+};
+
+export const scifiMaterial = ({scene, wAng=null, uScale=null, vScale=null}) => {
+  const csgMeshMaterial = new StandardMaterial('material'+(Math.random()*1000).toFixed(0), scene);
+  csgMeshMaterial.bumpTexture = new Texture(scifiNormal, scene, true, false);
+  csgMeshMaterial.diffuseTexture = new Texture(scifiDiff, scene);
+  if (wAng !== null) {
+    (csgMeshMaterial.diffuseTexture as Texture).wAng = wAng;
+    (csgMeshMaterial.bumpTexture as Texture).wAng = wAng;
+  }
+  if (uScale !== null) {
+    (csgMeshMaterial.diffuseTexture as Texture).uScale = uScale;
+    (csgMeshMaterial.bumpTexture as Texture).uScale = uScale;
+  }
+  if (vScale !== null) {
+    (csgMeshMaterial.diffuseTexture as Texture).vScale = vScale;
+    (csgMeshMaterial.bumpTexture as Texture).vScale = vScale;
+  }
+  csgMeshMaterial.specularColor = Color3.FromInts(55, 55, 0);
+  return csgMeshMaterial
 };
 
 export const Floor1 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
@@ -210,7 +316,7 @@ export const Floor1 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
       const ep = MeshBuilder.ExtrudePolygon("polygon", {
         shape:floor1Outer,
         holes:floor1Inner,
-        depth: 2.5,
+        depth: 2.7,
         sideOrientation: Mesh.DOUBLESIDE,
       }, scene, Earcut);
       const csg = CSG.FromMesh(ep);
@@ -219,37 +325,35 @@ export const Floor1 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
         height: 1.2,
         depth: 1,
       }, scene);
-      window.position = new Vector3(4, -1, -0.2);
+      window.position = new Vector3(4, -1.2, -0.2);
 
       const door1 = BoxBuilder.CreateBox('door1', {
         width: 0.8,
         height: 2,
         depth: 1,
       }, scene);
-      door1.position = new Vector3(1, -1.51, 5.5);
+      door1.position = new Vector3(1, -1.71, 5.5);
       const door2 = BoxBuilder.CreateBox('door2', {
         width: 1.2,
         height: 2,
         depth: 1,
       }, scene);
-      door2.position = new Vector3(2, -1.51, 4.5);
+      door2.position = new Vector3(2, -1.71, 4.5);
       door2.rotate(new Vector3(0,1,0), Math.PI/2);
       const door3 = BoxBuilder.CreateBox('door3', {
         width: 0.9,
         height: 2,
         depth: 1,
       }, scene);
-      door3.position = new Vector3(0, -1.51, 3.5);
+      door3.position = new Vector3(0, -1.71, 3.5);
       door3.rotate(new Vector3(0,1,0), Math.PI/2);
       let res = csg.subtract(CSG.FromMesh(window));
       res = res.subtract(CSG.FromMesh(door1));
       res = res.subtract(CSG.FromMesh(door2));
       res = res.subtract(CSG.FromMesh(door3));
-      const csgMeshMaterial = new StandardMaterial('material01', scene);
-      csgMeshMaterial.diffuseColor = Color3.White();
-      csgMeshMaterial.specularColor = Color3.Black();
+      const csgMeshMaterial = woodSidingMaterial({scene});
       const mesh = res.toMesh(meshIds.floor1, csgMeshMaterial, scene, false);
-      mesh.position.y += 3;
+      mesh.position.y += 3.2;
       window.dispose();
       door1.dispose();
       door2.dispose();
@@ -265,6 +369,11 @@ export const Floor1 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
 
 export const Basement = forwardRef<Mesh, {scene}>(({scene}, ref) => {
   usePointer(meshIds.basement, ref);
+  useEffect(() => {
+    if((ref as MutableRefObject<Mesh>).current) {
+      (ref as MutableRefObject<Mesh>).current.material = woodParquetMaterial({scene, wAng: Math.PI/2});
+    }
+  }, []);
   return <extrudePolygon
     ref={ref}
     name={meshIds.basement}
@@ -273,9 +382,25 @@ export const Basement = forwardRef<Mesh, {scene}>(({scene}, ref) => {
     depth={0.5}
     sideOrientation= {Mesh.DOUBLESIDE}
     position={new Vector3(0, 0.5, 0)}
-  >
-    <standardMaterial name='basementMaterial' diffuseColor={Color3.Gray()} specularColor={Color3.Yellow()} />
-  </extrudePolygon>
+  />
+});
+
+export const BasementVeranda = forwardRef<Mesh, {scene}>(({scene}, ref) => {
+  usePointer(meshIds.basementVeranda, ref);
+  useEffect(() => {
+    if((ref as MutableRefObject<Mesh>).current) {
+      (ref as MutableRefObject<Mesh>).current.material = woodFloorMaterial({scene, wAng: Math.PI/2});
+    }
+  }, []);
+  return <extrudePolygon
+    ref={ref}
+    name={meshIds.basementVeranda}
+    earcutInjection={Earcut}
+    shape={basementVerandaOuter}
+    depth={0.5}
+    sideOrientation= {Mesh.DOUBLESIDE}
+    position={new Vector3(0, 0.5, 0)}
+  />
 });
 
 export const Veranda = forwardRef<Mesh, {scene}>(({scene}, ref) => {
@@ -308,18 +433,14 @@ export const Veranda = forwardRef<Mesh, {scene}>(({scene}, ref) => {
       let res = csg.subtract(CSG.FromMesh(window1));
       res = res.subtract(CSG.FromMesh(window2));
       res = res.subtract(CSG.FromMesh(door1));
-      const csgMeshMaterial = new StandardMaterial('material01', scene);
-      csgMeshMaterial.diffuseColor = Color3.White();
-      csgMeshMaterial.specularColor = Color3.Black();
+      const csgMeshMaterial = woodSidingMaterial({scene});
       const mesh = res.toMesh(meshIds.veranda, csgMeshMaterial, scene, false);
       mesh.position.y += 3;
       window1.dispose();
       window2.dispose();
       door1.dispose();
       ep.dispose();
-      mesh.parent = node;
-      (ref as MutableRefObject<Mesh>).current = mesh;
-      verandaFrames.forEach((point, i) => {
+      const sticks = verandaFrames.map((point, i) => {
         const stick = MeshBuilder.ExtrudePolygon(`veranda-stick${i}`, {
           shape: [
             new Vector3(point.x-0.1, 0, point.z-0.1),
@@ -330,27 +451,33 @@ export const Veranda = forwardRef<Mesh, {scene}>(({scene}, ref) => {
           depth: 1.2,
           sideOrientation: Mesh.DOUBLESIDE,
         }, scene, Earcut);
+        stick.material = woodSidingMaterial({scene, wAng: Math.PI/2});
         stick.position.y += 2.6;
-        stick.parent = node
-      })
+        return stick;
+      });
+      const bigStick = MeshBuilder.ExtrudePolygon(`verandastick`, {
+        shape: verandaStick,
+        depth: 2.5,
+        sideOrientation: Mesh.DOUBLESIDE,
+      }, scene, Earcut);
+      bigStick.material = woodSidingMaterial({scene, wAng: Math.PI/2});
+      bigStick.position = new Vector3(0, 3.0, 0);
+      const mergedVeranda = Mesh.MergeMeshes([mesh, bigStick, ...sticks], true, true, undefined, false, true);
+      mergedVeranda.parent = node;
+      (ref as MutableRefObject<Mesh>).current = mergedVeranda;
     }
   }, []);
   usePointer(meshIds.veranda, ref);
-  return <mesh ref={cb} name={`${meshIds.veranda}-container`} >
-    <extrudePolygon
-      name='verandastick'
-      shape={verandaStick}
-      depth={2.5}
-      sideOrientation= {Mesh.DOUBLESIDE}
-      earcutInjection={Earcut}
-      position={new Vector3(0, 3.0, 0)}
-    >
-    <standardMaterial name='verandastickMaterial' diffuseColor={Color3.White()} specularColor={Color3.Black()} />
-    </extrudePolygon></mesh>
+  return <mesh ref={cb} name={`${meshIds.veranda}-container`} />;
 });
 
 export const Base2 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
   usePointer(meshIds.basement2, ref);
+  useEffect(() => {
+    if((ref as MutableRefObject<Mesh>).current) {
+      (ref as MutableRefObject<Mesh>).current.material = woodParquetMaterial({scene, wAng: Math.PI/2});
+    }
+  }, []);
   return <extrudePolygon
     ref={ref}
     name={meshIds.basement2}
@@ -359,10 +486,10 @@ export const Base2 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
     holes={base2Holes}
     depth={0.2}
     sideOrientation= {Mesh.DOUBLESIDE}
-    position={new Vector3(0, 3.2, 0)}
-  >
-    <standardMaterial name='basementMaterial' diffuseColor={Color3.White()} specularColor={Color3.Black()} />
-  </extrudePolygon>
+    position={new Vector3(0.01, 3.21, 0.01)}
+    scaling-z={0.98}
+    scaling-x={0.98}
+  />
 });
 
 export const Floor2 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
@@ -371,7 +498,7 @@ export const Floor2 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
       const ep = MeshBuilder.ExtrudePolygon("polygon", {
         shape:floor2Outer,
         holes:floor2Inner,
-        depth: 2.5,
+        depth: 2.7,
         sideOrientation: Mesh.DOUBLESIDE,
       }, scene, Earcut);
       const csg = CSG.FromMesh(ep);
@@ -394,14 +521,14 @@ export const Floor2 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
         height: 2,
         depth: 1,
       }, scene);
-      door1.position = new Vector3(2.4, -1.51, 4.7);
+      door1.position = new Vector3(2.4, -1.71, 4.7);
       substract.push(door1);
       const door2 = BoxBuilder.CreateBox('door2', {
         width: 0.8,
         height: 2,
         depth: 1,
       }, scene);
-      door2.position = new Vector3(2.8, -1.51, 4.2);
+      door2.position = new Vector3(2.8, -1.71, 4.2);
       door2.rotate(new Vector3(0,1,0), Math.PI/2);
       substract.push(door2);
       const door3 = BoxBuilder.CreateBox('door3', {
@@ -409,7 +536,7 @@ export const Floor2 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
         height: 2,
         depth: 1,
       }, scene);
-      door3.position = new Vector3(1.8, -1.51, 2.75);
+      door3.position = new Vector3(1.8, -1.71, 2.75);
       door3.rotate(new Vector3(0,1,0), Math.PI/2);
       substract.push(door3);
       const door4 = BoxBuilder.CreateBox('door4', {
@@ -432,7 +559,7 @@ export const Floor2 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
         height: 2,
         depth: 10,
       }, scene);
-      roof1.position = new Vector3(3, 2 + Math.sqrt(2), 4.5);
+      roof1.position = new Vector3(3, 1.8 + Math.sqrt(2), 4.5);
       roof1.rotate(new Vector3(0,0,1), Math.PI/4);
       substract.push(roof1);
       const roof2 = BoxBuilder.CreateBox('roof2', {
@@ -440,18 +567,16 @@ export const Floor2 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
         height: 2,
         depth: 10,
       }, scene);
-      roof2.position = new Vector3(3, 2 + Math.sqrt(2), 4.5);
+      roof2.position = new Vector3(3, 1.8 + Math.sqrt(2), 4.5);
       roof2.rotate(new Vector3(0,0,1), -Math.PI/4);
       substract.push(roof2);
       let res;
       substract.forEach((s) => {
         res = (res || csg).subtract(CSG.FromMesh(s));
       })
-      const csgMeshMaterial = new StandardMaterial('material01', scene);
-      csgMeshMaterial.diffuseColor = Color3.White();
-      csgMeshMaterial.specularColor = Color3.Black();
+      const csgMeshMaterial = woodSidingMaterial({scene})
       const mesh = res.toMesh(meshIds.floor2, csgMeshMaterial, scene, false);
-      mesh.position.y += 5.7;
+      mesh.position.y += 5.9;
       substract.forEach((s) => {
         s.dispose();
       })
@@ -494,11 +619,11 @@ export const Base3 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
       substract.forEach((s) => {
         res = (res || csg).subtract(CSG.FromMesh(s));
       })
-      const csgMeshMaterial = new StandardMaterial('material01', scene);
-      csgMeshMaterial.diffuseColor = Color3.White();
-      csgMeshMaterial.specularColor = Color3.Black();
+      const csgMeshMaterial = scifiMaterial({scene, wAng: Math.PI/2});
       const mesh = res.toMesh(meshIds.basement3, csgMeshMaterial, scene, false);
-      mesh.position.y += 5.9;
+      mesh.position.y += 5.91;
+      mesh.position.x += 0.01;
+      mesh.position.z += 0.01;
       substract.forEach((s) => {
         s.dispose();
       })
@@ -543,9 +668,7 @@ export const Floor3 = forwardRef<Mesh, {scene}>(({scene}, ref) => {
       substract.forEach((s) => {
         res = (res || csg).subtract(CSG.FromMesh(s));
       });
-      const csgMeshMaterial = new StandardMaterial('material01', scene);
-      csgMeshMaterial.diffuseColor = Color3.White();
-      csgMeshMaterial.specularColor = Color3.Black();
+      const csgMeshMaterial = woodSidingMaterial({scene})
       const mesh = res.toMesh(meshIds.floor3, csgMeshMaterial, scene, false);
       mesh.position.y += 7.9;
       substract.forEach((s) => {
@@ -580,11 +703,16 @@ export const VerandaRoof = forwardRef<Mesh, {scene}>(({scene}, ref) => {
         sideOrientation: Mesh.DOUBLESIDE,
       }, scene);
       const csgMeshMaterial = new StandardMaterial('material02', scene);
-      csgMeshMaterial.diffuseColor = Color3.White();
+      csgMeshMaterial.bumpTexture = new Texture(wall1Normal, scene);
+      (csgMeshMaterial.bumpTexture as Texture).vScale = 14;
+      (csgMeshMaterial.bumpTexture as Texture).uScale = 7;
+      csgMeshMaterial.diffuseTexture = new Texture(wall1Diff, scene);
+      (csgMeshMaterial.diffuseTexture as Texture).vScale = 14;
+      (csgMeshMaterial.diffuseTexture as Texture).uScale = 7;
+      // (csgMeshMaterial.diffuseTexture as Texture).wAng = -Math.PI/2;
       csgMeshMaterial.specularColor = Color3.Black();
       extruded.material = csgMeshMaterial;
       extruded.position.y += 3;
-      extruded.parent = node;
 
       const rshape = [
         new Vector3(-3.8,-0.8/3, 0),
@@ -602,13 +730,17 @@ export const VerandaRoof = forwardRef<Mesh, {scene}>(({scene}, ref) => {
         cap: Mesh.CAP_ALL,
         sideOrientation: Mesh.DOUBLESIDE,
       }, scene);
-      const roofMaterial = new StandardMaterial('material03', scene);
-      roofMaterial.diffuseColor = Color3.White();
+      const roofMaterial = new StandardMaterial('materialvr03', scene);
+      roofMaterial.diffuseTexture = new Texture(roof1Texture, scene);
+      (roofMaterial.diffuseTexture as Texture).vScale = 14;
+      (roofMaterial.diffuseTexture as Texture).uScale = 7;
+      (roofMaterial.diffuseTexture as Texture).wAng = -Math.PI/2;
       roofMaterial.specularColor = Color3.Black();
       roof.material = roofMaterial;
       roof.position.y += 3;
-      roof.parent = node;
-      (ref as MutableRefObject<Mesh>).current = roof;
+      const mergedRoof = Mesh.MergeMeshes([extruded, roof], true, true, undefined, false, true);
+      mergedRoof.parent = node;
+      (ref as MutableRefObject<Mesh>).current = mergedRoof;
     }
   }, []);
   usePointer(meshIds.verandaRoof, ref);
@@ -641,8 +773,12 @@ export const MainRoof = forwardRef<Mesh, {scene}>(({scene}, ref) => {
         depth: 9.6,
         sideOrientation: Mesh.DOUBLESIDE,
       }, scene, Earcut);
-      const roofMaterial = new StandardMaterial('material03', scene);
-      roofMaterial.diffuseColor = Color3.White();
+      const roofMaterial = new StandardMaterial('materialmr03', scene);
+      roofMaterial.diffuseTexture = new Texture(roof1Texture, scene);
+      (roofMaterial.diffuseTexture as Texture).uAng = Math.PI/4;
+      (roofMaterial.diffuseTexture as Texture).vScale = 10;
+      (roofMaterial.diffuseTexture as Texture).uScale = 6;
+      (roofMaterial.diffuseTexture as Texture).wAng = -Math.PI/2;
       roofMaterial.specularColor = Color3.Black();
       roof.material = roofMaterial;
       roof.rotate(new Vector3(1,0,0), -Math.PI/2);
@@ -658,7 +794,8 @@ export const MainRoof = forwardRef<Mesh, {scene}>(({scene}, ref) => {
   return <mesh ref={cb} name={`${meshIds.mainRoof}-container`} />
 });
 
-export function House({scene, highlightLayer}) {
+export function House({highlightLayer}) {
+  const {scene} = useContext(SceneContext);
   const partRefs = Object.values(meshIds).reduce((acc, v) => ({...acc, [v]: useRef(null)}), {});
   const selected = useSelector(selectSelected);
   const hovered = useSelector(selectHovered);
@@ -679,29 +816,36 @@ export function House({scene, highlightLayer}) {
     Object.values(meshIds).forEach((meshId) => {
       if (!partRefs[meshId].current)
         return;
+      const mesh = partRefs[meshId].current as Mesh;
       if (selected && selectPartConfig[selectPartMap[selected]].hide.includes(meshId)) {
-        (partRefs[meshId].current as Mesh).isVisible = false;
+        mesh.isVisible = false;
         return;
       }
       if (hovered && selectPartConfig[selectPartMap[hovered]].hide.includes(meshId)) {
-        (partRefs[meshId].current as Mesh).material.alpha = 0.5;
+        if (mesh.subMeshes && mesh.subMeshes.length) {
+          mesh.subMeshes.forEach((m) => {(m as SubMesh).getMaterial().alpha = 0.5})
+        }
+        mesh.material.alpha = 0.5;
         return;
       }
-      (partRefs[meshId].current as Mesh).isVisible = true;
-      (partRefs[meshId].current as Mesh).material.alpha = 1;
+      if (mesh.subMeshes && mesh.subMeshes.length) {
+        mesh.subMeshes.forEach((m) => {(m as SubMesh).getMaterial().alpha = 1})
+      }
+      mesh.isVisible = true;
+      mesh.material.alpha = 1;
     })
   }, [selected, hovered]);
   //console.log(selected, hovered);
   //const {isHovered} = usePointer('test', 'test2');
   //console.log(isHovered);
   return (<>
-    <standardMaterial name="homemat" diffuseColor={Color3.FromInts(0,0,0)} alpha={0}/>
     <Basement ref={partRefs[meshIds.basement]} scene={scene} />
     <Floor1 ref={partRefs[meshIds.floor1]} scene={scene}/>
     <Base2 ref={partRefs[meshIds.basement2]} scene={scene} />
     <Floor2 ref={partRefs[meshIds.floor2]} scene={scene} />
     <Base3 ref={partRefs[meshIds.basement3]} scene={scene} />
     <Floor3 ref={partRefs[meshIds.floor3]} scene={scene} />
+    <BasementVeranda ref={partRefs[meshIds.basementVeranda]} scene={scene} />
     <Veranda ref={partRefs[meshIds.veranda]} scene={scene}/>
     <VerandaRoof ref={partRefs[meshIds.verandaRoof]} scene={scene}/>
     <MainRoof ref={partRefs[meshIds.mainRoof]} scene={scene}/>
