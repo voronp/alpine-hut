@@ -21,6 +21,10 @@ query allPeripheralGroups {
     Data
     Description
     Type
+    Object3DReference {
+      Type
+      Config
+    }
     Peripherals {
       ID
       Name
@@ -35,6 +39,10 @@ query allPeripheralGroups {
         z
       }
       LastUpdate
+      Object3DReference {
+        Type
+        Config
+      }
     }
   }
 }

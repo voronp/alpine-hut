@@ -47,6 +47,7 @@ export class Peripheral {
     Interface?: string;
     LastUpdate?: Date;
     Position?: Position;
+    Object3DReference?: Object3DReference;
 }
 
 export class PeripheralGroup {
@@ -56,6 +57,13 @@ export class PeripheralGroup {
     Type?: string;
     Description?: string;
     Peripherals?: Peripheral[];
+    Object3DReference?: Object3DReference;
+}
+
+export class Object3DReference {
+    ID: number;
+    Type?: string;
+    Config?: JSON;
 }
 
 export type JSON = any;

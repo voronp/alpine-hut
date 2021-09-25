@@ -13,6 +13,7 @@ import {join} from "path";
 import {CommonModule} from "../common/common.module";
 import {PeripheralGroupsResolver} from "../peripheral-groups/peripheral-groups.resolver";
 import {PeripheralGroupsModule} from "../peripheral-groups/peripheral-groups.module";
+import {Object3dReferencesModule} from "../object-3d-references/object-3d-references.module";
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import {PeripheralGroupsModule} from "../peripheral-groups/peripheral-groups.mod
     AuthModule,
     CommonModule,
     PeripheralGroupsModule,
+    Object3dReferencesModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersResolver, PeripheralGroupsResolver],

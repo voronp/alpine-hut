@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Color3,
   Vector3,
+  Vector4,
   CSG,
   MeshBuilder,
   StandardMaterial,
@@ -14,6 +15,11 @@ import {
   HighlightLayer,
   Texture,
   PBRMetallicRoughnessMaterial,
+  ReflectionProbe,
+  MultiMaterial,
+  FresnelParameters,
+  PBRMaterial,
+  RenderTargetTexture, ShadowGenerator,
 } from "@babylonjs/core";
 import { usePointer } from '../visualHooks';
 
@@ -29,6 +35,9 @@ import floor2Diff from '@assets/textures/TexturesCom_Wood_ParquetStrip6_512_albe
 import floor2Rough from '@assets/textures/TexturesCom_Wood_ParquetStrip6_512_roughness.jpg';
 import scifiDiff from '@assets/textures/TexturesCom_Scifi_Panel_512_albedo.jpg';
 import scifiNormal from '@assets/textures/TexturesCom_Scifi_Panel_512_normal.jpg';
+import brickDiff from '@assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512_albedo.jpg';
+import brickNormal from '@assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512_normal.jpg';
+import EnvTexture from '@assets/textures/TexturesCom_HDRPanorama182_1K_hdri_sphere_tone.jpg';
 import {SceneContext} from "react-babylonjs";
 
 // counter clock vice???
@@ -184,6 +193,7 @@ const meshIds = {
   floor3: 'floor3group',
   verandaRoof: 'veranda-roof-group',
   mainRoof: 'main-roof-group',
+  fireplace: 'fireplace',
 };
 
 const viewParts = {
@@ -191,6 +201,7 @@ const viewParts = {
   floor2: 'floor2Part',
   floor3: 'floor3Part',
   veranda: 'verandaPart',
+  fireplace: 'fireplacePart',
 };
 
 const selectPartMap = {
@@ -204,6 +215,7 @@ const selectPartMap = {
   [meshIds.basementVeranda]: viewParts.veranda,
   [meshIds.verandaRoof]: viewParts.veranda,
   [meshIds.mainRoof]: viewParts.floor3,
+  [meshIds.fireplace]: viewParts.fireplace,
 };
 
 const selectPartConfig = {
@@ -223,12 +235,17 @@ const selectPartConfig = {
     hide: [meshIds.verandaRoof],
     highlight: [meshIds.basementVeranda],
   },
+  [viewParts.fireplace]: {
+    hide: [meshIds.floor3, meshIds.floor2, meshIds.mainRoof, meshIds.basement2, meshIds.basement3],
+    highlight: [meshIds.fireplace],
+  },
 };
 
 export const woodSidingMaterial = ({scene, wAng=null, uScale=null, vScale=null}) => {
   const csgMeshMaterial = new StandardMaterial('material'+(Math.random()*1000).toFixed(0), scene);
-  csgMeshMaterial.bumpTexture = new Texture(wall1Normal, scene, true, false);
+  csgMeshMaterial.bumpTexture = new Texture(wall1Normal, scene);
   csgMeshMaterial.diffuseTexture = new Texture(wall1Diff, scene);
+  csgMeshMaterial.invertNormalMapY = true;
   const vRatio = 1.6;
   if (wAng !== null) {
     (csgMeshMaterial.diffuseTexture as Texture).wAng = wAng;
@@ -250,8 +267,9 @@ export const woodSidingMaterial = ({scene, wAng=null, uScale=null, vScale=null})
 
 export const woodFloorMaterial = ({scene, wAng=null, uScale=null, vScale=null}) => {
   const csgMeshMaterial = new StandardMaterial('material'+(Math.random()*1000).toFixed(0), scene);
-  csgMeshMaterial.bumpTexture = new Texture(floor1Normal, scene, true, false);
+  csgMeshMaterial.bumpTexture = new Texture(floor1Normal, scene);
   csgMeshMaterial.diffuseTexture = new Texture(floor1Diff, scene);
+  csgMeshMaterial.invertNormalMapY = true;
   if (wAng !== null) {
     (csgMeshMaterial.diffuseTexture as Texture).wAng = wAng;
     (csgMeshMaterial.bumpTexture as Texture).wAng = wAng;
@@ -291,8 +309,30 @@ export const woodParquetMaterial = ({scene, wAng=null, uScale=null, vScale=null}
 
 export const scifiMaterial = ({scene, wAng=null, uScale=null, vScale=null}) => {
   const csgMeshMaterial = new StandardMaterial('material'+(Math.random()*1000).toFixed(0), scene);
-  csgMeshMaterial.bumpTexture = new Texture(scifiNormal, scene, true, false);
+  csgMeshMaterial.bumpTexture = new Texture(scifiNormal, scene);
   csgMeshMaterial.diffuseTexture = new Texture(scifiDiff, scene);
+  csgMeshMaterial.invertNormalMapY = true;
+  if (wAng !== null) {
+    (csgMeshMaterial.diffuseTexture as Texture).wAng = wAng;
+    (csgMeshMaterial.bumpTexture as Texture).wAng = wAng;
+  }
+  if (uScale !== null) {
+    (csgMeshMaterial.diffuseTexture as Texture).uScale = uScale;
+    (csgMeshMaterial.bumpTexture as Texture).uScale = uScale;
+  }
+  if (vScale !== null) {
+    (csgMeshMaterial.diffuseTexture as Texture).vScale = vScale;
+    (csgMeshMaterial.bumpTexture as Texture).vScale = vScale;
+  }
+  csgMeshMaterial.specularColor = Color3.FromInts(55, 55, 0);
+  return csgMeshMaterial
+};
+
+export const brickMaterial = ({scene, wAng=null, uScale=null, vScale=null}) => {
+  const csgMeshMaterial = new StandardMaterial('material'+(Math.random()*1000).toFixed(0), scene);
+  csgMeshMaterial.bumpTexture = new Texture(brickNormal, scene);
+  csgMeshMaterial.diffuseTexture = new Texture(brickDiff, scene);
+  csgMeshMaterial.invertNormalMapY = true;
   if (wAng !== null) {
     (csgMeshMaterial.diffuseTexture as Texture).wAng = wAng;
     (csgMeshMaterial.bumpTexture as Texture).wAng = wAng;
@@ -371,7 +411,17 @@ export const Basement = forwardRef<Mesh, {scene}>(({scene}, ref) => {
   usePointer(meshIds.basement, ref);
   useEffect(() => {
     if((ref as MutableRefObject<Mesh>).current) {
-      (ref as MutableRefObject<Mesh>).current.material = woodParquetMaterial({scene, wAng: Math.PI/2});
+      const bmesh:Mesh = (ref as MutableRefObject<Mesh>).current;
+      // console.log(bmesh.getTotalIndices());
+      const mat1 = brickMaterial({scene});
+      const mat2 = woodParquetMaterial({scene, wAng: Math.PI/2});
+      bmesh.material = new MultiMaterial('basementMultiMat', scene);
+      (bmesh.material as MultiMaterial).subMaterials.push(mat2);
+      (bmesh.material as MultiMaterial).subMaterials.push(mat1);
+      const vcount = bmesh.getTotalVertices();
+
+      new SubMesh(0, 0, vcount, 0, 12, bmesh);
+      new SubMesh(1, 0, vcount, 12, 60, bmesh);
     }
   }, []);
   return <extrudePolygon
@@ -382,6 +432,12 @@ export const Basement = forwardRef<Mesh, {scene}>(({scene}, ref) => {
     depth={0.5}
     sideOrientation= {Mesh.DOUBLESIDE}
     position={new Vector3(0, 0.5, 0)}
+    faceUV={[
+      new Vector4(0, 0, 6 / 2.5, 8 / 2.5),
+      new Vector4(0, 0, 28 / 2.5, 0.5 / 2.5),
+      new Vector4(0, 0, 0, 0),
+    ]}
+    wrap={true}
   />
 });
 
@@ -389,7 +445,16 @@ export const BasementVeranda = forwardRef<Mesh, {scene}>(({scene}, ref) => {
   usePointer(meshIds.basementVeranda, ref);
   useEffect(() => {
     if((ref as MutableRefObject<Mesh>).current) {
-      (ref as MutableRefObject<Mesh>).current.material = woodFloorMaterial({scene, wAng: Math.PI/2});
+      const bmesh:Mesh = (ref as MutableRefObject<Mesh>).current;
+      const mat1 = brickMaterial({scene});
+      const mat2 = woodFloorMaterial({scene, wAng: Math.PI/2});
+      bmesh.material = new MultiMaterial('basementMultiMat', scene);
+      (bmesh.material as MultiMaterial).subMaterials.push(mat2);
+      (bmesh.material as MultiMaterial).subMaterials.push(mat1);
+      const vcount = bmesh.getTotalVertices();
+
+      new SubMesh(0, 0, vcount, 0, 12, bmesh);
+      new SubMesh(1, 0, vcount, 12, 60, bmesh);
     }
   }, []);
   return <extrudePolygon
@@ -400,6 +465,12 @@ export const BasementVeranda = forwardRef<Mesh, {scene}>(({scene}, ref) => {
     depth={0.5}
     sideOrientation= {Mesh.DOUBLESIDE}
     position={new Vector3(0, 0.5, 0)}
+    faceUV={[
+      new Vector4(0, 0, 3 / 2.5, 8 / 2.5),
+      new Vector4(0, 0, 22 / 2.5, 0.5 / 2.5),
+      new Vector4(0, 0, 0, 0),
+    ]}
+    wrap={true}
   />
 });
 
@@ -687,33 +758,29 @@ export const VerandaRoof = forwardRef<Mesh, {scene}>(({scene}, ref) => {
 
   const triangle = [
     new Vector3(0,0,0),
-    new Vector3(0,1,0),
-    new Vector3(-3,0,0),
+    new Vector3(3,0,0),
+    new Vector3(3,0,1),
   ];
   triangle.push(triangle[0]);
   const cb = useCallback(node => {
     if(node) {
-      const extruded = MeshBuilder.ExtrudeShape("ext", {
+      const UVRatio = 2.5;
+      const extruded = MeshBuilder.ExtrudePolygon("ext", {
         shape: triangle,
-        path: [
-          new Vector3(0,0,0),
-          new Vector3(0,0,8),
-        ],
-        cap: Mesh.CAP_ALL,
+        depth: 8,
         sideOrientation: Mesh.DOUBLESIDE,
-      }, scene);
-      const csgMeshMaterial = new StandardMaterial('material02', scene);
-      csgMeshMaterial.bumpTexture = new Texture(wall1Normal, scene);
-      (csgMeshMaterial.bumpTexture as Texture).vScale = 14;
-      (csgMeshMaterial.bumpTexture as Texture).uScale = 7;
-      csgMeshMaterial.diffuseTexture = new Texture(wall1Diff, scene);
-      (csgMeshMaterial.diffuseTexture as Texture).vScale = 14;
-      (csgMeshMaterial.diffuseTexture as Texture).uScale = 7;
-      // (csgMeshMaterial.diffuseTexture as Texture).wAng = -Math.PI/2;
-      csgMeshMaterial.specularColor = Color3.Black();
+        faceUV: [
+          new Vector4(0, 0, 3 / UVRatio, 1 / UVRatio),
+          new Vector4(0, 0, 7.2 / UVRatio, 8 / UVRatio),
+          new Vector4(0, 0, 3 / UVRatio, 1 / UVRatio),
+        ],
+        wrap: true,
+      }, scene, Earcut);
+      const csgMeshMaterial = woodSidingMaterial({scene});
       extruded.material = csgMeshMaterial;
+      extruded.rotate(new Vector3(1, 0, 0), -Math.PI/2);
       extruded.position.y += 3;
-
+      extruded.position.x -= 3;
       const rshape = [
         new Vector3(-3.8,-0.8/3, 0),
         new Vector3(0,1,0),
@@ -734,7 +801,7 @@ export const VerandaRoof = forwardRef<Mesh, {scene}>(({scene}, ref) => {
       roofMaterial.diffuseTexture = new Texture(roof1Texture, scene);
       (roofMaterial.diffuseTexture as Texture).vScale = 14;
       (roofMaterial.diffuseTexture as Texture).uScale = 7;
-      (roofMaterial.diffuseTexture as Texture).wAng = -Math.PI/2;
+      (roofMaterial.diffuseTexture as Texture).wAng = Math.PI/2;
       roofMaterial.specularColor = Color3.Black();
       roof.material = roofMaterial;
       roof.position.y += 3;
@@ -758,7 +825,6 @@ export const MainRoof = forwardRef<Mesh, {scene}>(({scene}, ref) => {
   const fader = useRef(new FadeInOutBehavior());
   const cb = useCallback(node => {
     if(node) {
-
       const rshape = [
         new Vector3(-0.6,0,-0.6),
         new Vector3(3,0,3),
@@ -775,10 +841,9 @@ export const MainRoof = forwardRef<Mesh, {scene}>(({scene}, ref) => {
       }, scene, Earcut);
       const roofMaterial = new StandardMaterial('materialmr03', scene);
       roofMaterial.diffuseTexture = new Texture(roof1Texture, scene);
-      (roofMaterial.diffuseTexture as Texture).uAng = Math.PI/4;
       (roofMaterial.diffuseTexture as Texture).vScale = 10;
       (roofMaterial.diffuseTexture as Texture).uScale = 6;
-      (roofMaterial.diffuseTexture as Texture).wAng = -Math.PI/2;
+      (roofMaterial.diffuseTexture as Texture).wAng = Math.PI/2;
       roofMaterial.specularColor = Color3.Black();
       roof.material = roofMaterial;
       roof.rotate(new Vector3(1,0,0), -Math.PI/2);
@@ -794,6 +859,153 @@ export const MainRoof = forwardRef<Mesh, {scene}>(({scene}, ref) => {
   return <mesh ref={cb} name={`${meshIds.mainRoof}-container`} />
 });
 
+export const Fireplace = forwardRef<Mesh, {scene, reflectOthers}>(({scene, reflectOthers}, ref) => {
+
+  const cb = useCallback(node => {
+    if(node) {
+      const b1:Mesh = MeshBuilder.CreateBox('lbase', {
+        width: 0.6,
+        height: 0.3,
+        depth: 0.3,
+        faceUV: [
+          new Vector4(0, 0, 0.6, 0.3),
+          new Vector4(0, 0, 0.6, 0.3),
+          new Vector4(0, 0, 0.3, 0.3),
+          new Vector4(0, 0, 0.3, 0.3),
+        ],
+        wrap: true,
+      }, scene);
+      b1.material = brickMaterial({scene});
+      const b2:Mesh = MeshBuilder.CreateBox('rbase', {
+        width: 0.6,
+        height: 0.3,
+        depth: 0.3,
+        faceUV: [
+          new Vector4(0, 0, 0.6, 0.3),
+          new Vector4(0, 0, 0.6, 0.3),
+          new Vector4(0, 0, 0.3, 0.3),
+          new Vector4(0, 0, 0.3, 0.3),
+        ],
+        wrap: true,
+      }, scene);
+      b2.position.z += 0.7;
+      b2.material = brickMaterial({scene});
+      const hor1:Mesh = MeshBuilder.CreateBox('hor1', {
+        width: 0.7,
+        height: 0.1,
+        depth: 1.2,
+        faceUV: [
+          new Vector4(0, 0, 0.7, 0.1),
+          new Vector4(0, 0, 0.7, 0.1),
+          new Vector4(0, 0, 1.2 * 2, 0.1),
+          new Vector4(0, 0, 1.2 * 2, 0.1),
+          new Vector4(0, 0, 0.7, 1.2 * (20/32)),
+        ],
+        wrap: true,
+      }, scene);
+      hor1.position.y += 0.2;
+      hor1.position.z += 0.35;
+      hor1.position.x += 0.05;
+      hor1.material = brickMaterial({scene});
+      const fboxshape = [
+        new Vector3(-0.3,0,-0.1),
+        new Vector3(0.3,0,-0.1),
+        new Vector3(0.3,0,0.1),
+        new Vector3(-0.2,0,0.1),
+        new Vector3(-0.2,0,0.6),
+        new Vector3(0.3, 0,0.6),
+        new Vector3(0.3, 0,0.8),
+        new Vector3(-0.3, 0,0.8),
+      ];
+      fboxshape.push(fboxshape[0]);
+      const shapeLength = fboxshape.map((v, i) => (i ? Vector3.Distance(v, fboxshape[i-1]) : 0));
+      const fbox = MeshBuilder.ExtrudePolygon('firebox', {
+        shape:fboxshape,
+        depth: 0.6,
+        sideOrientation: Mesh.DOUBLESIDE,
+        faceUV: [
+          new Vector4(0, 0, 0, 0),
+          new Vector4(0, 0, shapeLength.reduce((acc, l) => (acc + l)), 0.6),
+          new Vector4(0, 0, 0, 0),
+        ],
+        wrap: true,
+      }, scene, Earcut);
+      fbox.position.y += 0.85;
+      fbox.material = brickMaterial({scene});
+      const hor2:Mesh = MeshBuilder.CreateBox('hor2', {
+        width: 0.7,
+        height: 0.1,
+        depth: 1.2,
+        faceUV: [
+          new Vector4(0, 0, 0.7, 0.1),
+          new Vector4(0, 0, 0.7, 0.1),
+          new Vector4(0, 0, 1.2 * 2, 0.1),
+          new Vector4(0, 0, 1.2 * 2, 0.1),
+          new Vector4(0, 0, 0.7, 1.2 * (20/32)),
+        ],
+        wrap: true,
+      }, scene);
+      hor2.position.y += 0.9;
+      hor2.position.z += 0.35;
+      hor2.position.x += 0.05;
+      hor2.material = brickMaterial({scene});
+      const airbox:Mesh = MeshBuilder.CreateBox('airbox', {
+        width: 0.6,
+        height: 1.4,
+        depth: 0.9,
+      }, scene);
+      const pbr = new PBRMetallicRoughnessMaterial("airboxMat", scene);
+      pbr.baseColor = new Color3(1.0, 1, 1);
+      pbr.metallic = 0;
+      pbr.roughness = 1.0;
+      airbox.material = pbr;
+      airbox.position.y += 1.65;
+      airbox.position.z += 0.35;
+      const tube:Mesh = MeshBuilder.CreateCylinder('tube', {
+        height: 5.8,
+        diameter: 0.4,
+      });
+      tube.position.y += 5.25;
+      tube.position.z += 0.35;
+      const pbr2 = new PBRMaterial("tubeMat", scene);
+      pbr2.albedoColor = new Color3(1, 1, 1);
+      pbr2.metallic = 0.9;
+      pbr2.roughness = 0.1;
+      const probe = new ReflectionProbe("satelliteProbe", 512, scene);
+      probe.renderList.push(airbox);
+      for (let index = 0; index < reflectOthers.length; index++) {
+        if (reflectOthers[index].current)
+          probe.renderList.push(reflectOthers[index].current);
+      }
+      pbr2.reflectionTexture = probe.cubeTexture;
+      pbr2.realTimeFiltering = true;
+      tube.material = pbr2;
+      probe.refreshRate = 60;
+      probe.attachToMesh(tube);
+      tube.receiveShadows = true;
+      const tube2:Mesh = MeshBuilder.CreateCylinder('tube', {
+        height: 0.2,
+        diameter: 0.5,
+      });
+      tube2.position.y += 8.05;
+      tube2.position.z += 0.35;
+      tube2.material = pbr2;
+      tube2.receiveShadows = true;
+      probe.attachToMesh(tube2);
+      const mergedFireplace = Mesh.MergeMeshes([b1, b2, hor1, hor2, fbox, airbox, tube, tube2], true, true, undefined, false, true);
+      mergedFireplace.receiveShadows = true;
+      mergedFireplace.position.y += 0.15;
+      (ref as MutableRefObject<Mesh>).current = mergedFireplace;
+      mergedFireplace.parent = node;
+      mergedFireplace.position.y += 0.5;
+      mergedFireplace.position.z += 1.5;
+      mergedFireplace.position.x += 2.35;
+    }
+  }, []);
+  usePointer(meshIds.fireplace, ref);
+  return <mesh ref={cb} name={`${meshIds.fireplace}-container`} />
+});
+
 export function House({highlightLayer}) {
   const {scene} = useContext(SceneContext);
   const partRefs = Object.values(meshIds).reduce((acc, v) => ({...acc, [v]: useRef(null)}), {});
@@ -807,6 +1019,20 @@ export function House({highlightLayer}) {
       (highlightLayer.current as HighlightLayer).removeAllMeshes();
     }
   };
+  useEffect(() => {
+    scene.lights.forEach((light) => {
+      const sg = light.getShadowGenerator();
+      if (sg) {
+        sg.getShadowMap().refreshRate = 100;
+        Object.values(partRefs).forEach((ref) => {
+          if ((ref as MutableRefObject<Mesh>).current) {
+            (ref as MutableRefObject<Mesh>).current.receiveShadows = true;
+            // (sg as ShadowGenerator).addShadowCaster((ref as MutableRefObject<Mesh>).current);
+          }
+        })
+      }
+    });
+  }, []);
   useEffect(() => {
     let highlighted = null;
     if (hovered && selected !== hovered) {
@@ -849,5 +1075,6 @@ export function House({highlightLayer}) {
     <Veranda ref={partRefs[meshIds.veranda]} scene={scene}/>
     <VerandaRoof ref={partRefs[meshIds.verandaRoof]} scene={scene}/>
     <MainRoof ref={partRefs[meshIds.mainRoof]} scene={scene}/>
+    <Fireplace ref={partRefs[meshIds.fireplace]} scene={scene} reflectOthers={Object.values(partRefs)} />
     </>)
 }

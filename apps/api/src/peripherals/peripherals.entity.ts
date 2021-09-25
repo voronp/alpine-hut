@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {Object3dReference} from "../object-3d-references/object-3d-references.entity";
 
 export enum PeripheralInterface {
   WIRE = "1wire",
@@ -54,4 +55,11 @@ export class Peripheral {
 
   @Column({type: 'json'})
   Position: PeripheralPosition;
+
+  @Column()
+  Object3DReferenceID: number;
+
+  @ManyToOne(() => Object3dReference, ref => ref.Peripherals)
+  @JoinColumn({ name: "Object3DReferenceID" })
+  Object3DReference: Object3dReference;
 }

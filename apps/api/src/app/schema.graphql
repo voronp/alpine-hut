@@ -41,6 +41,7 @@ type Peripheral {
   Interface: String
   LastUpdate: Date
   Position: Position
+  Object3DReference: Object3DReference
 }
 
 type PeripheralGroup {
@@ -50,4 +51,11 @@ type PeripheralGroup {
   Type: String
   Description: String
   Peripherals: [Peripheral]
+  Object3DReference: Object3DReference
+}
+
+type Object3DReference {
+  ID: Int!
+  Type: String
+  Config: JSON
 }
