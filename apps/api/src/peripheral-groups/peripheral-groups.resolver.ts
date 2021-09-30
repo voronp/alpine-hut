@@ -1,4 +1,4 @@
-import {Parent, Query, ResolveField, Resolver} from '@nestjs/graphql';
+import {Parent, Query, ResolveField, Resolver, Args} from '@nestjs/graphql';
 import {PeripheralGroupsService} from "./peripheral-groups.service";
 import {UseGuards} from "@nestjs/common";
 import {GqlAuthGuard} from "../auth/gql-jwt-auth.guard";
@@ -19,6 +19,16 @@ export class PeripheralGroupsResolver {
   async peripheralGroupList(@CurrentUser() user: User) {
     // for now will not check exact permissions besides user is logged in
     return this.peripheralGroupService.findAll()
+  }
+
+  @Query(returns => PeripheralGroup)
+  @UseGuards(GqlAuthGuard)
+  async getPeripheralGroupsBy3DPart(@Args('view3DPart') view3DPart: String, @CurrentUser() user: User) {
+    // for now will not check exact permissions besides user is logged in
+    return this.peripheralGroupService.findBy3DPart(view3DPart).then(res => {
+      console.log(res);
+      return res;
+    });
   }
 
   @ResolveField()

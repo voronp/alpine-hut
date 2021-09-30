@@ -111,6 +111,7 @@
         "build": {
           "builder": "@nrwl/node:build",
           "options": {
+            "showCircularDependencies": false,
             "outputPath": "dist/apps/api",
             "main": "apps/api/src/main.ts",
             "tsConfig": "apps/api/tsconfig.app.json",

@@ -39,6 +39,9 @@ import brickDiff from '@assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512_a
 import brickNormal from '@assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512_normal.jpg';
 import EnvTexture from '@assets/textures/TexturesCom_HDRPanorama182_1K_hdri_sphere_tone.jpg';
 import {SceneContext} from "react-babylonjs";
+import {usePeripheralGroupsBy3DPartLazyQuery} from "@home/data-access";
+import TreeNode from "primereact/components/treenode/TreeNode";
+import {Object3DReference} from "./Object3DReference";
 
 // counter clock vice???
 const floor1Outer = [
@@ -1011,6 +1014,12 @@ export function House({highlightLayer}) {
   const partRefs = Object.values(meshIds).reduce((acc, v) => ({...acc, [v]: useRef(null)}), {});
   const selected = useSelector(selectSelected);
   const hovered = useSelector(selectHovered);
+  const [selectedPart, setSelectedPart] = useState(null);
+  const [getPeripheralGroupsBy3DPart, {
+    called,
+    loading,
+    data: peripheralGroupsBy3DPart,
+  }] = usePeripheralGroupsBy3DPartLazyQuery();
   const highlightMesh = (id) => {
     if(id && partRefs[id].current && highlightLayer.current && !(highlightLayer.current as HighlightLayer).hasMesh(partRefs[id].current)) {
       highlightLayer.current.addMesh(partRefs[id].current, Color3.Green());
@@ -1039,6 +1048,9 @@ export function House({highlightLayer}) {
       highlighted = selectPartConfig[selectPartMap[hovered]].highlight;
     }
     highlightMesh(highlighted);
+    if (selectedPart !== selectPartMap[selected]) {
+      setSelectedPart(selectPartMap[selected]);
+    }
     Object.values(meshIds).forEach((meshId) => {
       if (!partRefs[meshId].current)
         return;
@@ -1061,6 +1073,16 @@ export function House({highlightLayer}) {
       mesh.material.alpha = 1;
     })
   }, [selected, hovered]);
+
+  useEffect(() => {
+    if (selectedPart) {
+      getPeripheralGroupsBy3DPart({
+        variables: {
+          View3DPart: selectedPart,
+        }
+      })
+    }
+  }, [selectedPart]);
   //console.log(selected, hovered);
   //const {isHovered} = usePointer('test', 'test2');
   //console.log(isHovered);
@@ -1076,5 +1098,10 @@ export function House({highlightLayer}) {
     <VerandaRoof ref={partRefs[meshIds.verandaRoof]} scene={scene}/>
     <MainRoof ref={partRefs[meshIds.mainRoof]} scene={scene}/>
     <Fireplace ref={partRefs[meshIds.fireplace]} scene={scene} reflectOthers={Object.values(partRefs)} />
+    {
+      peripheralGroupsBy3DPart && peripheralGroupsBy3DPart.getPeripheralGroupsBy3DPart.map((v) => (
+        <Object3DReference Type={v.Object3DReference.Type} Config={v.Object3DReference.Config}/>
+      ))
+    }
     </>)
 }

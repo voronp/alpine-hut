@@ -47,6 +47,39 @@ query allPeripheralGroups {
   }
 }
 
+query peripheralGroupsBy3DPart($View3DPart: String) {
+  getPeripheralGroupsBy3DPart(view3DPart: $View3DPart) {
+    ID
+    Name
+    Data
+    Description
+    Type
+    Object3DReference {
+      Type
+      Config
+    }
+    Peripherals {
+      ID
+      Name
+      Type
+      Interface
+      IsActive
+      Description
+      Data
+      Position {
+        x
+        y
+        z
+      }
+      LastUpdate
+      Object3DReference {
+        Type
+        Config
+      }
+    }
+  }
+}
+
 mutation addPeripheralGroup($Name: String!, $Data: JSON!, $Description: String, $Type: String!) {
   addPeripheralGroup(Name: $Name, Data: $Data, Description: $Description, Type: $Type) {
     ID

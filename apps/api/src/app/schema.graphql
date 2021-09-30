@@ -25,6 +25,7 @@ type User {
 type Query {
   whoAmI: User
   peripheralGroupList: [PeripheralGroup]
+  getPeripheralGroupsBy3DPart(view3DPart: String): [PeripheralGroup]
 }
 
 type Mutation {
@@ -57,5 +58,8 @@ type PeripheralGroup {
 type Object3DReference {
   ID: Int!
   Type: String
+  ActiveIn: String
   Config: JSON
+  Peripherals: [Peripheral]
+  PeripheralGroups: [PeripheralGroup]
 }

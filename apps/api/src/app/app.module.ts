@@ -28,6 +28,7 @@ import {Object3dReferencesModule} from "../object-3d-references/object-3d-refere
       entities: [
 
       ],
+      logging: true,
       //synchronize: true,
     }),
     GraphQLModule.forRoot({

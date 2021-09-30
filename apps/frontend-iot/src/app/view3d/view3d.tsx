@@ -1,6 +1,7 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react'
+import React, {useRef, useState, useEffect, useCallback, useContext} from 'react'
+import { ApolloProvider, ApolloContextValue, getApolloContext } from '@apollo/react-hooks';
 import { Provider } from 'react-redux';
-import {Engine, Scene, GlowLayer} from 'react-babylonjs'
+import {Engine, Scene, GlowLayer, SceneContext} from 'react-babylonjs'
 import { Vector3, Color3, Scene as BScene, CubeTexture } from '@babylonjs/core'
 import {use3DParts, usePointer} from './visualHooks'
 import {House} from './components/House'
@@ -37,6 +38,7 @@ const onSceneMounted = (sceneEventArgs) => {
 };
 
 export function View3d(props: View3dProps) {
+  const {client} = useContext<ApolloContextValue>(getApolloContext());
   const {grassMaterial} = use3DParts(scene);
   const highlightLayerEL = useRef(null);
   const cameraRef = useCallback((camera) => {
@@ -81,7 +83,9 @@ export function View3d(props: View3dProps) {
           </ground>
           <box name="home_group" position={new Vector3(10, 0, 5)} width={0.01} height={0.01} depth={0.01}>
             <Provider store={store}>
-              <House highlightLayer={highlightLayerEL}/>
+              <ApolloProvider client={client}>
+                <House highlightLayer={highlightLayerEL}/>
+              </ApolloProvider>
             </Provider>
           </box>
         </Scene>
