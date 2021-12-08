@@ -42,7 +42,7 @@ import {SceneContext} from "react-babylonjs";
 import {usePeripheralGroupsBy3DPartLazyQuery} from "@home/data-access";
 import TreeNode from "primereact/components/treenode/TreeNode";
 import {Object3DReference} from "./Object3DReference";
-
+import { PeripheralGroupInfo } from './PeripheralGroupInfo';
 // counter clock vice???
 const floor1Outer = [
   new Vector3(6, 0, 0),
@@ -1100,7 +1100,21 @@ export function House({highlightLayer}) {
     <Fireplace ref={partRefs[meshIds.fireplace]} scene={scene} reflectOthers={Object.values(partRefs)} />
     {
       peripheralGroupsBy3DPart && peripheralGroupsBy3DPart.getPeripheralGroupsBy3DPart.map((v) => (
-        <Object3DReference Type={v.Object3DReference.Type} Config={v.Object3DReference.Config}/>
+        <Object3DReference
+          key={v.ID}
+          ID={v.ID}
+          Type={v.Object3DReference.Type}
+          Config={v.Object3DReference.Config}
+        >
+          <PeripheralGroupInfo
+            ID={v.ID}
+            Type={v.Type}
+            Data={v.Data}
+            Description={v.Description}
+            Name={v.Name}
+            Peripherals={v.Peripherals}
+          />
+        </Object3DReference>
       ))
     }
     </>)

@@ -5,7 +5,7 @@ import GraphQLJSON from 'graphql-type-json';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import {UsersResolver} from '../users/users.resolver'
+import { UsersResolver } from '../users/users.resolver'
 
 import {environment} from '../environments/environment'
 import {AuthModule} from "../auth/auth.module";
@@ -14,6 +14,8 @@ import {CommonModule} from "../common/common.module";
 import {PeripheralGroupsResolver} from "../peripheral-groups/peripheral-groups.resolver";
 import {PeripheralGroupsModule} from "../peripheral-groups/peripheral-groups.module";
 import {Object3dReferencesModule} from "../object-3d-references/object-3d-references.module";
+import {PeripheralsModule} from "../peripherals/peripherals.module";
+import {BaseModule} from "../base/base.module";
 
 @Module({
   imports: [
@@ -41,9 +43,15 @@ import {Object3dReferencesModule} from "../object-3d-references/object-3d-refere
     AuthModule,
     CommonModule,
     PeripheralGroupsModule,
+    PeripheralsModule,
     Object3dReferencesModule,
+    BaseModule,
   ],
   controllers: [AppController],
-  providers: [AppService, UsersResolver, PeripheralGroupsResolver],
+  providers: [
+    AppService,
+    UsersResolver,
+    PeripheralGroupsResolver,
+  ],
 })
 export class AppModule {}

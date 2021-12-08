@@ -39,6 +39,10 @@ export abstract class IMutation {
     abstract addPeripheralGroup(Name: string, Data: JSON, Description?: string, Type?: string): PeripheralGroup | Promise<PeripheralGroup>;
 }
 
+export abstract class ISubscription {
+    abstract peripheralUpdated(peripheralID: string): Peripheral | Promise<Peripheral>;
+}
+
 export class Peripheral {
     ID: number;
     Name?: string;

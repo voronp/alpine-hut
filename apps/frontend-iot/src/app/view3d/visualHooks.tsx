@@ -3,7 +3,7 @@ import {GrassProceduralTexture} from "@babylonjs/procedural-textures";
 import {Space, Vector3} from "@babylonjs/core";
 import { useClick, useHover } from 'react-babylonjs';
 import { useDispatch, useSelector } from 'react-redux'
-import { pointerActions, selectHovered, selectSelected } from '../pointer.slice';
+import {pointerActions, selectHovered, selectSelected, selectSubHovered, selectSubSelected} from '../pointer.slice';
 
 export function use3DParts(scene) {
   const grassMaterial = useCallback(material => {
@@ -23,18 +23,15 @@ export function usePointer(key, valueRef) {
   const isHovered = useSelector(selectHovered) === key;
   useClick(
     (event) => {
-      console.log('useClick', event);
       dispatch(pointerActions.setSelected({key}));
     },
     valueRef,
   );
   useHover(
     (event) => {
-      console.log('1', event);
       dispatch(pointerActions.setHovered({key}));
     },
     (event) => {
-      console.log('0', event);
       dispatch(pointerActions.setHovered(null));
     },
     valueRef,
@@ -43,4 +40,35 @@ export function usePointer(key, valueRef) {
     isSelected,
     isHovered,
   }
+}
+
+export function useSubPointer(key, valueRef) {
+  const dispatch = useDispatch();
+  const isSubSelected = useSelector(selectSubSelected) === key;
+  const isSubHovered = useSelector(selectSubHovered) === key;
+  useClick(
+    (event) => {
+      dispatch(pointerActions.setSubSelected({key}));
+    },
+    valueRef,
+  );
+  useHover(
+    (event) => {
+      dispatch(pointerActions.setSubHovered({key}));
+    },
+    (event) => {
+      dispatch(pointerActions.setSubHovered(null));
+    },
+    valueRef,
+  );
+  return {
+    isSubSelected,
+    isSubHovered,
+  }
+}
+
+export default {
+  use3DParts,
+  usePointer,
+  useSubPointer,
 }

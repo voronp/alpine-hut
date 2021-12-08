@@ -32,6 +32,10 @@ type Mutation {
   addPeripheralGroup(Name: String!, Data: JSON!, Description: String, Type: String): PeripheralGroup
 }
 
+type Subscription {
+  peripheralUpdated(peripheralID: ID!): Peripheral
+}
+
 type Peripheral {
   ID: Int!
   Name: String

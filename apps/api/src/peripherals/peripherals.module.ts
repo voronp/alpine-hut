@@ -9,7 +9,7 @@ import {Object3dReferencesModule} from "../object-3d-references/object-3d-refere
 @Module({
   imports: [
     TypeOrmModule.forFeature([Peripheral]),
-    Object3dReferencesModule
+    Object3dReferencesModule,
   ],
   controllers: [PeripheralsController],
   providers: [PeripheralsResolver, PeripheralsService],

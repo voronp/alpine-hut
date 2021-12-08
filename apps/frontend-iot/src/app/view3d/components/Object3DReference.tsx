@@ -1,4 +1,14 @@
-import React, {useCallback, useState, useMemo, useRef, useEffect, forwardRef, MutableRefObject, useContext} from 'react';
+import React, {
+  useCallback,
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+  forwardRef,
+  MutableRefObject,
+  useContext,
+  ComponentPropsWithRef, ReactNode
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Color3,
@@ -22,10 +32,14 @@ import {
   RenderTargetTexture, ShadowGenerator,
 } from "@babylonjs/core";
 import { Box, Sphere } from 'react-babylonjs'
-
+import { useSubPointer} from "../visualHooks";
+import { selectHovered, selectSelected, selectSubSelected } from "../../pointer.slice";
+import { Object3DLinkedInfo } from "./Object3DLinkedInfo";
 export interface Object3DReferenceProps {
+  ID: number
   Type: string
   Config: PropsConfig
+  children?: ReactNode
 }
 
 export interface PropsConfig {
@@ -33,6 +47,7 @@ export interface PropsConfig {
   Radius?: number,
   Dimensions?: Vector3,
   Rotation?: Vector3,
+  Material?: any,
 }
 
 const getComponentByType = (type) => {
@@ -61,6 +76,25 @@ const convertConf = (conf: PropsConfig):Record<string, any> => {
 };
 
 export function Object3DReference(props: Object3DReferenceProps) {
-  const Component = getComponentByType(props.Type);
-  return (<Component {...convertConf(props.Config)}/>)
+  const Component = getComponentByType(props.Type) as ComponentPropsWithRef<any>;
+  const objRef = useRef(null);
+  const {
+    isSubHovered,
+    isSubSelected,
+  } = useSubPointer(`ObjRef${props.ID}`, objRef);
+  return (<>
+    <Component ref={objRef} name={`ObjRefName${props.ID}`} {...convertConf(props.Config)}>
+      <standardMaterial
+        name={`ObjRefName${props.ID}-mat`}
+        diffuseColor={isSubHovered ? Color3.Yellow() : Color3.Gray()}
+        specularColor={Color3.Black()}
+        alpha={isSubHovered ? 0.5 : 0.01}
+      />
+    </Component>
+    {
+      isSubSelected && <Object3DLinkedInfo LinkedTo={objRef.current}>
+        {props.children}
+      </Object3DLinkedInfo>
+    }
+  </>)
 }
