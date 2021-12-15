@@ -12,6 +12,7 @@ const hardwareProvider = {
 };
 
 @Module({
-  providers: [hardwareProvider]
+  providers: [hardwareProvider],
+  exports: [hardwareProvider],
 })
 export class HardwareModule {}

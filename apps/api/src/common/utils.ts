@@ -1,3 +1,5 @@
+import {time} from "cron";
+
 export function withCancel<T>(
   asyncIterator: AsyncIterator<T | undefined>,
   onCancel: () => void,
@@ -11,4 +13,16 @@ export function withCancel<T>(
     return savedReturn();
   };
   return asyncIterator;
+}
+
+export async function callUntilDone(fn:() => Promise<any>, timeout: number, tries: number) {
+  if (!tries)
+    return;
+  const delay = () => new Promise((res) => setTimeout(() => res(), timeout));
+  try {
+    return fn();
+  } catch (e) {
+    await delay();
+    return callUntilDone(fn, timeout, tries-1);
+  }
 }

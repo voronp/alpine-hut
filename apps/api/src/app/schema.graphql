@@ -30,6 +30,8 @@ type Query {
 
 type Mutation {
   addPeripheralGroup(Name: String!, Data: JSON!, Description: String, Type: String): PeripheralGroup
+  activatePeripheralGroup(ID: Int!): PeripheralGroup
+  deactivatePeripheralGroup(ID: Int!): PeripheralGroup
 }
 
 type Subscription {

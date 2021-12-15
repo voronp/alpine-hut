@@ -87,7 +87,7 @@ export function readDevices () {
   });
 }
 
-export function readDevice (deviceName) {
+export function readDevice (deviceName):Promise<{name:string, value:number}> {
   return new Promise(function (fulfill, reject) {
     const path = getDevicePath(deviceName);
     readFile(path, function (err, content) {

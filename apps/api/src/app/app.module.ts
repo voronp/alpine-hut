@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import GraphQLJSON from 'graphql-type-json';
 
 import { AppController } from './app.controller';
@@ -16,9 +17,11 @@ import {PeripheralGroupsModule} from "../peripheral-groups/peripheral-groups.mod
 import {Object3dReferencesModule} from "../object-3d-references/object-3d-references.module";
 import {PeripheralsModule} from "../peripherals/peripherals.module";
 import {BaseModule} from "../base/base.module";
+import {HistoryModule} from "../history/history.module";
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: environment.database.host,
@@ -46,6 +49,7 @@ import {BaseModule} from "../base/base.module";
     PeripheralsModule,
     Object3dReferencesModule,
     BaseModule,
+    HistoryModule,
   ],
   controllers: [AppController],
   providers: [

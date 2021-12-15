@@ -37,6 +37,10 @@ export abstract class IQuery {
 
 export abstract class IMutation {
     abstract addPeripheralGroup(Name: string, Data: JSON, Description?: string, Type?: string): PeripheralGroup | Promise<PeripheralGroup>;
+
+    abstract activatePeripheralGroup(ID: number): PeripheralGroup | Promise<PeripheralGroup>;
+
+    abstract deactivatePeripheralGroup(ID: number): PeripheralGroup | Promise<PeripheralGroup>;
 }
 
 export abstract class ISubscription {
