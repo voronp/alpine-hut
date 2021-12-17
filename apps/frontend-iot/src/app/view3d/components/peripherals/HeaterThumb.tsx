@@ -27,21 +27,37 @@ export function HeaterThumb(props: HeaterProps) {
     <textBlock
       name={`label-p-h-name-${props.ID}`}
       text={props.Name}
+      textHorizontalAlignment={Control.HORIZONTAL_ALIGNMENT_LEFT}
       width={'200px'}
-      horizontalAlignment={Control.HORIZONTAL_ALIGNMENT_RIGHT}
     />
     {
-      props.IsActive ? <rectangle key={`warming-${props.ID}`} background={'#FF0000'} cornerRadius={6}><textBlock
-        name={`label-p-h-warming-${props.ID}`}
-        text="Warming"
-        width={'100px'}
-        color={'#FFFFFF'}
-      /></rectangle> : <rectangle key={`off-${props.ID}`} background={'#999999'} cornerRadius={6}><textBlock
-        name={`label-p-h-off-${props.ID}`}
-        text="Off"
-        width={'100px'}
-        color={'#FFFFFF'}
-      /></rectangle>
+      props.IsActive ?
+        <rectangle
+          key={`warming-${props.ID}`}
+          background={'#FF0000'}
+          cornerRadius={6}
+          alpha={0.5}
+          width={'100px'}
+        >
+          <textBlock
+            name={`label-p-h-warming-${props.ID}`}
+            text="Warming"
+            color={'#0000FF'}
+          />
+        </rectangle> :
+        <rectangle
+          key={`off-${props.ID}`}
+          background={'#999999'}
+          cornerRadius={6}
+          alpha={0.5}
+          width={'100px'}
+        >
+          <textBlock
+            name={`label-p-h-off-${props.ID}`}
+            text="Off"
+            color={'#0000FF'}
+          />
+        </rectangle>
     }
 
   </stackPanel>

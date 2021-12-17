@@ -14,6 +14,7 @@ import React, {
 
 import { SensorProps } from './PeripheralProps'
 import {Control} from "@babylonjs/gui";
+import { guiStyle } from '@home/ui';
 
 export function SensorThumb(props: SensorProps) {
   return <stackPanel
@@ -22,20 +23,18 @@ export function SensorThumb(props: SensorProps) {
     verticalAlignment={Control.VERTICAL_ALIGNMENT_TOP}
     horizontalAlignment={Control.HORIZONTAL_ALIGNMENT_LEFT}
     height={'30px'}
-    width={'100%'}
   >
     <textBlock
       name={`label-p-s-name-${props.ID}`}
       text={props.Name}
-      width={'250px'}
-      horizontalAlignment={Control.HORIZONTAL_ALIGNMENT_LEFT}
-      left={0}
+      width={'200px'}
+      textHorizontalAlignment={Control.HORIZONTAL_ALIGNMENT_LEFT}
     />
     <textBlock
       name={`label-p-s-value-${props.ID}`}
       text={String(props.Data.Temperature.toFixed(1))+'°C'}
-      width={'50px'}
-      horizontalAlignment={Control.HORIZONTAL_ALIGNMENT_RIGHT}
+      width={'100px'}
+      textHorizontalAlignment={Control.HORIZONTAL_ALIGNMENT_RIGHT}
     />
   </stackPanel>
 

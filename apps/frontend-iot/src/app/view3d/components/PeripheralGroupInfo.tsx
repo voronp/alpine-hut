@@ -34,12 +34,13 @@ import {
   RenderTargetTexture, ShadowGenerator,
 } from "@babylonjs/core";
 import { Control } from '@babylonjs/gui';
-import { Box, Sphere } from 'react-babylonjs'
+import {Box, Sphere, useClick, useHover} from 'react-babylonjs'
 import { useSubPointer} from "../visualHooks";
-import {selectHovered, selectSelected, selectSubSelected} from "../../pointer.slice";
 
 import {SensorThumb} from './peripherals/SensorThumb';
 import {HeaterThumb} from './peripherals/HeaterThumb';
+import {managerPopupActions} from "../../manager-popup.slice";
+
 const componentDict = {
   Sensor: SensorThumb,
   Heater: HeaterThumb,
@@ -56,20 +57,44 @@ export interface PeripheralGroupInfoProps {
 }
 
 export function PeripheralGroupInfo(props: PeripheralGroupInfoProps) {
-  console.log(props);
-  const objRef = useRef(null);
-  const lineRef = useRef(null);
+  const showActiveStatus = 'IsActive' in props.Data;
+  const dispatch = useDispatch();
+  const onClick = () => dispatch(managerPopupActions.openPopup(props));
   return (<stackPanel
     name={`stack-pg-${props.ID}`}
     verticalAlignment={Control.VERTICAL_ALIGNMENT_TOP}
     horizontalAlignment={Control.HORIZONTAL_ALIGNMENT_CENTER}
-    width={'300px'}
+    width={'310px'}
+    paddingBottom={'5px'}
+    paddingTop={'5px'}
+    paddingLeft={'5px'}
+    paddingRight={'5px'}
+    fontSize={'24px'}
+    hoverCursor={'pointer'}
+    onPointerDownObservable={onClick}
   >
     <textBlock
       name={`label-pg-name-${props.ID}`}
       text={props.Name}
-      height={'20px'}
+      height={'30px'}
+      fontWeight={'bold'}
+      fontSize={'24px'}
     />
+    {
+      showActiveStatus ?
+        <rectangle
+          key={`status-${props.ID}`}
+          height={'30px'}
+          background={props.Data.IsActive ? 'green' : '#999999'}
+          width={'100%'}
+        >
+          <textBlock
+            name={`label-status-${props.ID}`}
+            text={props.Data.IsActive ? 'Enabled' : 'Disabled'}
+            color={'#FFFFFF'}
+          />
+        </rectangle> : ''
+    }
     {
       props.Peripherals.map(p => {
         const Component = componentDict[p.Type];
