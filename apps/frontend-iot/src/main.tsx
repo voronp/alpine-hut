@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import App from './app/app';
 import { environment } from './environments/environment';
 
-import { ApolloProvider } from '@apollo/react-hooks';
+import { ApolloProvider } from '@apollo/client';
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';

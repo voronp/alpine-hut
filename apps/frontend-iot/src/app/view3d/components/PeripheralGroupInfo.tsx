@@ -38,13 +38,20 @@ import { Box, Sphere } from 'react-babylonjs'
 import { useSubPointer} from "../visualHooks";
 import {selectHovered, selectSelected, selectSubSelected} from "../../pointer.slice";
 
+import {SensorThumb} from './peripherals/SensorThumb';
+import {HeaterThumb} from './peripherals/HeaterThumb';
+const componentDict = {
+  Sensor: SensorThumb,
+  Heater: HeaterThumb,
+};
+
 export interface PeripheralGroupInfoProps {
   ID: number
   Type: string
   Data: any
   Description: string
   Name: string
-  Peripherals: any
+  Peripherals: any[]
   children?: ReactNode
 }
 
@@ -63,5 +70,11 @@ export function PeripheralGroupInfo(props: PeripheralGroupInfoProps) {
       text={props.Name}
       height={'20px'}
     />
+    {
+      props.Peripherals.map(p => {
+        const Component = componentDict[p.Type];
+        return <Component key={p.ID} {...p} />
+      })
+    }
   </stackPanel>)
 }

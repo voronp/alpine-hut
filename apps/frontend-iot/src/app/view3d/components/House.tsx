@@ -40,7 +40,7 @@ import brickNormal from '@assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512
 import EnvTexture from '@assets/textures/TexturesCom_HDRPanorama182_1K_hdri_sphere_tone.jpg';
 import {SceneContext} from "react-babylonjs";
 import {usePeripheralGroupsBy3DPartLazyQuery} from "@home/data-access";
-import TreeNode from "primereact/components/treenode/TreeNode";
+import TreeNode from "primereact/treenode";
 import {Object3DReference} from "./Object3DReference";
 import { PeripheralGroupInfo } from './PeripheralGroupInfo';
 // counter clock vice???

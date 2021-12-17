@@ -4,7 +4,7 @@ import { TreeTable } from 'primereact/treetable';
 import { Column } from 'primereact/column';
 import styles from './peripheral-list.module.scss';
 import { useAllPeripheralGroupsQuery } from "@home/data-access";
-import TreeNode from "primereact/components/treenode/TreeNode";
+import TreeNode from "primereact/treenode";
 
 /* eslint-disable-next-line */
 export interface PeripheralListProps {}

@@ -27,7 +27,6 @@
   },
   "private": true,
   "dependencies": {
-    "@apollo/react-hooks": "^4.0.0",
     "@babylonjs/core": "^4.2.0",
     "@babylonjs/gui": "^4.2.0",
     "@babylonjs/procedural-textures": "^4.2.0",

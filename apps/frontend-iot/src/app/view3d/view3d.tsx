@@ -1,5 +1,5 @@
 import React, {useRef, useState, useEffect, useCallback, useContext} from 'react'
-import { ApolloProvider, ApolloContextValue, getApolloContext } from '@apollo/react-hooks';
+import { ApolloProvider, ApolloContextValue, getApolloContext } from '@apollo/client';
 import { Provider } from 'react-redux';
 import {Engine, Scene, GlowLayer, SceneContext} from 'react-babylonjs'
 import { Vector3, Color3, Scene as BScene, CubeTexture } from '@babylonjs/core'
@@ -55,7 +55,7 @@ export function View3d(props: View3dProps) {
   return (
     <div className={styles.wrapper} style={{display: props.isActive ? 'initial' : 'none'}}>
       <Engine antialias canvasId='babylonJS' adaptToDeviceRatio={true} canvasStyle={{width: '100%', height: '100%'}} >
-        <Scene enableInteractions={true} onSceneMount={onSceneMounted}>
+        <Scene onSceneMount={onSceneMounted}>
           <highlightLayer ref={highlightLayerEL} name="highlight"/>
           <freeCamera ref={cameraRef}  name="camera1" rotation={new Vector3(10,-10,10)} position={new Vector3(0, 10, 0)}/>
           <hemisphericLight name='light1' intensity={0.7} direction={Vector3.Up()} />
