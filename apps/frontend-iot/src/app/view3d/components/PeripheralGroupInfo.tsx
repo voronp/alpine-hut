@@ -46,20 +46,22 @@ const componentDict = {
   Heater: HeaterThumb,
 };
 
+export const IPeripheralGroupInfoProps = Symbol("IPeripheralGroupInfoProps");
+
 export interface PeripheralGroupInfoProps {
+  [IPeripheralGroupInfoProps]?: true
   ID: number
   Type: string
   Data: any
   Description: string
   Name: string
   Peripherals: any[]
-  children?: ReactNode
 }
 
 export function PeripheralGroupInfo(props: PeripheralGroupInfoProps) {
   const showActiveStatus = 'IsActive' in props.Data;
   const dispatch = useDispatch();
-  const onClick = () => dispatch(managerPopupActions.openPopup(props));
+  const onClick = () => dispatch(managerPopupActions.openPopup({ ...props, [IPeripheralGroupInfoProps]: true }));
   return (<stackPanel
     name={`stack-pg-${props.ID}`}
     verticalAlignment={Control.VERTICAL_ALIGNMENT_TOP}

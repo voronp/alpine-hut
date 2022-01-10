@@ -22,7 +22,9 @@ export class PeripheralsResolver {
   }
 
   @Subscription('peripheralUpdated', {
-    filter: (payload, variables) => (payload.peripheral.ID === variables.ID),
+    filter: (payload, variables) => {
+      return payload.peripheralUpdated.ID === variables.peripheralID;
+    },
   })
   public peripheralUpdated() {
     return withCancel(this.pubSub.asyncIterator('peripheralUpdated'), () => {

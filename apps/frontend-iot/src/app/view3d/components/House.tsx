@@ -39,7 +39,7 @@ import brickDiff from '@assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512_a
 import brickNormal from '@assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512_normal.jpg';
 import EnvTexture from '@assets/textures/TexturesCom_HDRPanorama182_1K_hdri_sphere_tone.jpg';
 import {SceneContext} from "react-babylonjs";
-import {usePeripheralGroupsBy3DPartLazyQuery} from "@home/data-access";
+import {OnPeripheralUpdatedDocument, usePeripheralGroupsBy3DPartLazyQuery} from "@home/data-access";
 import TreeNode from "primereact/treenode";
 import {Object3DReference} from "./Object3DReference";
 import { PeripheralGroupInfo } from './PeripheralGroupInfo';
@@ -1019,6 +1019,7 @@ export function House({highlightLayer}) {
     called,
     loading,
     data: peripheralGroupsBy3DPart,
+    subscribeToMore: subscribeToPeripheralGroupUpdate,
   }] = usePeripheralGroupsBy3DPartLazyQuery();
   const highlightMesh = (id) => {
     if(id && partRefs[id].current && highlightLayer.current && !(highlightLayer.current as HighlightLayer).hasMesh(partRefs[id].current)) {
@@ -1083,6 +1084,26 @@ export function House({highlightLayer}) {
       })
     }
   }, [selectedPart]);
+  useEffect(() => {
+    if(!peripheralGroupsBy3DPart || !peripheralGroupsBy3DPart.getPeripheralGroupsBy3DPart) return;
+    const unsubscribers = [];
+    peripheralGroupsBy3DPart.getPeripheralGroupsBy3DPart.forEach(pg => {
+      pg.Peripherals.forEach(p => {
+        unsubscribers.push(subscribeToPeripheralGroupUpdate({
+          document: OnPeripheralUpdatedDocument,
+          variables: { PeripheralID: p.ID },
+          updateQuery: (prev, { subscriptionData }) => {
+            console.log(subscriptionData);
+            return {...prev};
+          },
+        }));
+      });
+    });
+    // unsubscribe to updates
+    return () => {
+      unsubscribers.forEach(f => f());
+    }
+  }, [peripheralGroupsBy3DPart && peripheralGroupsBy3DPart.getPeripheralGroupsBy3DPart]);
   //console.log(selected, hovered);
   //const {isHovered} = usePointer('test', 'test2');
   //console.log(isHovered);

@@ -89,3 +89,12 @@ mutation addPeripheralGroup($Name: String!, $Data: JSON!, $Description: String, 
     Type
   }
 }
+
+subscription onPeripheralUpdated($PeripheralID: Int!) {
+  peripheralUpdated(peripheralID: $PeripheralID) {
+    ID
+    Data
+    LastUpdate
+    IsActive
+  }
+}

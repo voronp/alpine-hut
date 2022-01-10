@@ -11,9 +11,11 @@ import {Route, Link, useHistory} from 'react-router-dom';
 import {PeripheralList} from './peripheral-list/peripheral-list';
 import {View3d} from './view3d/view3d';
 import {loginThunk, logoutThunk, getAuthState, authActions} from './auth.slice';
-
+import {selectManagerPopupIsOpened, managerPopupActions, selectManagerPopupData} from './manager-popup.slice'
 import {AppHeader, HeaderProps} from '@home/ui';
 import {useWhoAmIQuery} from "@home/data-access";
+import { Dialog } from 'primereact/dialog';
+import {ManagerPopup} from "./manager-popup";
 
 export function App() {
   const dispatch = useDispatch();
@@ -60,8 +62,7 @@ console.log(authActions);
             </>
         }
       </main>
-
-
+      <ManagerPopup/>
       <div className="footer flex">
         footer
       </div>

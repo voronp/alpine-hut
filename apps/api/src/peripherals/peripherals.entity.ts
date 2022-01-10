@@ -9,8 +9,8 @@ export enum PeripheralInterface {
 }
 
 export enum PeripheralType {
-  SENSOR = "sensor",
-  HEATER = "heater"
+  SENSOR = "Sensor",
+  HEATER = "Heater"
 }
 
 export type PeripheralPosition = {

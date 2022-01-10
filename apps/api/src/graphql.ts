@@ -1,5 +1,6 @@
 
-/** ------------------------------------------------------
+/*
+ * ------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
  * -------------------------------------------------------
  */
@@ -44,7 +45,7 @@ export abstract class IMutation {
 }
 
 export abstract class ISubscription {
-    abstract peripheralUpdated(peripheralID: string): Peripheral | Promise<Peripheral>;
+    abstract peripheralUpdated(peripheralID: number): Peripheral | Promise<Peripheral>;
 }
 
 export class Peripheral {

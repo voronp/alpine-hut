@@ -9,6 +9,7 @@ import {AbstractHardware} from "../hardware/abstract-hardware";
 import { callUntilDone } from '../common/utils';
 import {HistoryService} from "../history/history.service";
 import {HistoryActions, HistoryReasons} from "../history/history.entity";
+import {PubSub} from "graphql-subscriptions";
 
 @Injectable()
 export class PeripheralGroupsService implements OnApplicationBootstrap {
@@ -17,6 +18,8 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
   constructor(
     @Inject('STATE')
     private serverState: ServerState,
+    @Inject('PUB_SUB')
+    private pubSub: PubSub,
     @InjectRepository(PeripheralGroup)
     private peripheralGroupRepository: Repository<PeripheralGroup>,
     @InjectRepository(Peripheral)
@@ -121,6 +124,7 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
       const heaterPeripheral = pg.Peripherals.find((p) => p.Type === PeripheralType.HEATER);
       if (!sensorPeripheral || !heaterPeripheral) {
         // log invalid configuration
+        console.log(sensorPeripheral, heaterPeripheral);
         throw new Error('Configuration is invalid, please update');
       }
       const activateHeaterMethod:string = heaterPeripheral.Data.Active === 'HIGH' ? 'setHighPIO' : 'setLowPIO';
@@ -164,8 +168,8 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
         throw new Error('Sensor malfunction');
       }
       try {
-        await this.peripheralRepository.save(sensorPeripheral);
-        await this.peripheralRepository.save(heaterPeripheral);
+        await this.savePeripheral(sensorPeripheral);
+        await this.savePeripheral(heaterPeripheral);
       } catch (e) {
         // log database fail
         throw new Error(`Database error: ${e}`);
@@ -191,7 +195,7 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
       const deactivateHeaterMethod:string = heaterPeripheral.Data.Active === AbstractHardware.HIGH ? 'setLowPIO' : 'setHighPIO';
       this.hardwareProvider[deactivateHeaterMethod](heaterPeripheral.Data.Pin);
       heaterPeripheral.IsActive = false;
-      await this.peripheralRepository.save(heaterPeripheral);
+      await this.savePeripheral(heaterPeripheral);
     }
     this.serverState.unsetPeripheralGroupActive(pg);
     pg.Data.IsActive = false;
@@ -226,5 +230,11 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
       throw e;
     }
     return this.findOne(ID);
+  }
+
+  async savePeripheral(peripheral: Peripheral) {
+    await this.peripheralRepository.save(peripheral);
+    console.warn(peripheral);
+    return this.pubSub.publish('peripheralUpdated', { peripheralUpdated: peripheral });
   }
 }

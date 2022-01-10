@@ -35,7 +35,7 @@ type Mutation {
 }
 
 type Subscription {
-  peripheralUpdated(peripheralID: ID!): Peripheral
+  peripheralUpdated(peripheralID: Int!): Peripheral
 }
 
 type Peripheral {
