@@ -4,9 +4,10 @@ import ReactDOM from 'react-dom';
 import App from './app/app';
 import { environment } from './environments/environment';
 
-import { ApolloProvider } from '@apollo/client';
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
+import { ApolloProvider, ApolloClient, InMemoryCache, createHttpLink, split } from '@apollo/client';
+import { getMainDefinition } from '@apollo/client/utilities';
 import { setContext } from '@apollo/client/link/context';
+import { WebSocketLink } from '@apollo/client/link/ws';
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 
@@ -21,6 +22,19 @@ const httpLink = createHttpLink({
   uri: environment.gqlUrl,
 });
 
+const wsLink = new WebSocketLink({
+  uri: environment.wsUrl,
+  options: {
+    reconnect: true,
+    connectionParams: () => {
+      const token = readToken();
+      return {
+        authToken: token,
+      }
+    },
+  }
+});
+
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
   const token = readToken();
@@ -33,8 +47,22 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+const authHttpLink = authLink.concat(httpLink);
+
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    );
+  },
+  wsLink,
+  authHttpLink,
+);
+
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: splitLink,
   cache: new InMemoryCache(),
 });
 

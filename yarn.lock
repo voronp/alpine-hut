@@ -1388,27 +1388,27 @@
     "@babel/helper-validator-identifier" "^7.15.7"
     to-fast-properties "^2.0.0"
 
-"@babylonjs/core@4.2.0", "@babylonjs/core@^4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@babylonjs/core/-/core-4.2.0.tgz#d1cfd43d7e3d2e58cde79083f04eeb607f6c8f18"
-  integrity sha512-sZQigPvMDc0pcgwlKvTF5gsMzGwT8gelQIOyxELrohdFu12pHGhIr61+yVxxq9tpCdzyYD9kS8LM0w2y+5ypkg==
+"@babylonjs/core@4.2.1", "@babylonjs/core@^4.2.1":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/core/-/core-4.2.1.tgz#9dc57dabf41d259a2343da308ec52575b368e588"
+  integrity sha512-Z2ZVNRKPB1UvmMeqQtxCJKrQtQ/hb5FcAZi66YEEE0MKBQlLmf6oZEM9vS1RljPK7NZoV/dZSdwjJgiQlGsuhA==
   dependencies:
     tslib ">=1.10.0"
 
-"@babylonjs/gui@^4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@babylonjs/gui/-/gui-4.2.0.tgz#c2a35ca6724759731fe0c4ddbfe2490301847f93"
-  integrity sha512-AQnqwFDmQ05FAw4B0BPVUFqWgdSKVI23qVHm/uOOMBQhMo8+WE2pTNATm6Qw/HDVLCp5qUjwIij/3JtG5s0fBw==
+"@babylonjs/gui@^4.2.1":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/gui/-/gui-4.2.1.tgz#e22e0ddfc456cc816500dd72ad034e1b41a53218"
+  integrity sha512-6gOolbWYFO5lrRWKunawYWQkX4a47dvuiIBrEmY6eKRN97e4f7YrR7oYolqeWFHLXzbn0JR0blOYQyUB5jQqmg==
   dependencies:
-    "@babylonjs/core" "4.2.0"
+    "@babylonjs/core" "4.2.1"
     tslib ">=1.10.0"
 
-"@babylonjs/procedural-textures@^4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@babylonjs/procedural-textures/-/procedural-textures-4.2.0.tgz#800b1a3bb596dc1ad9793806555df4725ed96ced"
-  integrity sha512-yUOkc9VGlNXnARNScmgYfE18vciIPxDJsx8WrXq5+tffYTrPTfNClie65x49g7U2VEVHqsPu/OvJxcPLVLaTvA==
+"@babylonjs/procedural-textures@^4.2.1":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/procedural-textures/-/procedural-textures-4.2.1.tgz#4009cdb85a2ec45a39946a217e7defb209619147"
+  integrity sha512-h5K+Y0XPduDa0M3VmmSefY/g9FxN2RDTxKVqqKUTLv61ONWstJ7Gnhd7ZEPHG8qkY/F0GGeDQPoI/DcYoVO56w==
   dependencies:
-    "@babylonjs/core" "4.2.0"
+    "@babylonjs/core" "4.2.1"
     tslib ">=1.10.0"
 
 "@bcoe/v8-coverage@^0.2.3":

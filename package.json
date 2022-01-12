@@ -27,9 +27,9 @@
   },
   "private": true,
   "dependencies": {
-    "@babylonjs/core": "^4.2.0",
-    "@babylonjs/gui": "^4.2.0",
-    "@babylonjs/procedural-textures": "^4.2.0",
+    "@babylonjs/core": "^4.2.1",
+    "@babylonjs/gui": "^4.2.1",
+    "@babylonjs/procedural-textures": "^4.2.1",
     "@nestjs/common": "^7.0.0",
     "@nestjs/core": "^7.0.0",
     "@nestjs/graphql": "^7.9.1",

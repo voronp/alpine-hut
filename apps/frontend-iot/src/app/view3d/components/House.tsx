@@ -39,7 +39,7 @@ import brickDiff from '@assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512_a
 import brickNormal from '@assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512_normal.jpg';
 import EnvTexture from '@assets/textures/TexturesCom_HDRPanorama182_1K_hdri_sphere_tone.jpg';
 import {SceneContext} from "react-babylonjs";
-import {OnPeripheralUpdatedDocument, usePeripheralGroupsBy3DPartLazyQuery} from "@home/data-access";
+import {OnPeripheralUpdatedDocument, Peripheral, usePeripheralGroupsBy3DPartLazyQuery} from "@home/data-access";
 import TreeNode from "primereact/treenode";
 import {Object3DReference} from "./Object3DReference";
 import { PeripheralGroupInfo } from './PeripheralGroupInfo';
@@ -1092,9 +1092,24 @@ export function House({highlightLayer}) {
         unsubscribers.push(subscribeToPeripheralGroupUpdate({
           document: OnPeripheralUpdatedDocument,
           variables: { PeripheralID: p.ID },
-          updateQuery: (prev, { subscriptionData }) => {
-            console.log(subscriptionData);
-            return {...prev};
+          updateQuery: <T, OnPeripheralUpdatedSubscription>(prev, { subscriptionData: { data } }) => {
+            const pgIndex = prev.getPeripheralGroupsBy3DPart.findIndex(prevpg => prevpg.ID === pg.ID);
+            if (pgIndex >= 0) {
+              const pIndex = prev.getPeripheralGroupsBy3DPart[pgIndex].Peripherals.findIndex(prevp => prevp.ID === data.peripheralUpdated.ID);
+              const newPeripheral = {
+                ...prev.getPeripheralGroupsBy3DPart[pgIndex].Peripherals[pIndex],
+                ...data.peripheralUpdated,
+              };
+              const updatedResult = {
+                ...prev,
+                getPeripheralGroupsBy3DPart: prev.getPeripheralGroupsBy3DPart.map(v => ({
+                  ...v,
+                  Peripherals: v.Peripherals.map(v => (v.ID === newPeripheral.ID ? newPeripheral : v)),
+                })),
+              };
+              return updatedResult;
+            }
+            return prev;
           },
         }));
       });
@@ -1103,7 +1118,11 @@ export function House({highlightLayer}) {
     return () => {
       unsubscribers.forEach(f => f());
     }
-  }, [peripheralGroupsBy3DPart && peripheralGroupsBy3DPart.getPeripheralGroupsBy3DPart]);
+  }, [
+    // checking peripheral groups are loaded and they are the same
+    peripheralGroupsBy3DPart
+    && peripheralGroupsBy3DPart.getPeripheralGroupsBy3DPart
+    && peripheralGroupsBy3DPart.getPeripheralGroupsBy3DPart.map(v => v.ID).join('-')]);
   //console.log(selected, hovered);
   //const {isHovered} = usePointer('test', 'test2');
   //console.log(isHovered);
