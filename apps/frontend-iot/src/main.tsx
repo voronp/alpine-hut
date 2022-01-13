@@ -8,6 +8,7 @@ import { ApolloProvider, ApolloClient, InMemoryCache, createHttpLink, split } fr
 import { getMainDefinition } from '@apollo/client/utilities';
 import { setContext } from '@apollo/client/link/context';
 import { WebSocketLink } from '@apollo/client/link/ws';
+import { TransportWSLink } from './lib/TransportWSLink';
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 
@@ -16,23 +17,18 @@ import { readToken } from './app/token';
 
 import { BrowserRouter } from 'react-router-dom';
 
-import { POINTER_FEATURE_KEY, pointerReducer } from './app/pointer.slice';
-
 const httpLink = createHttpLink({
   uri: environment.gqlUrl,
 });
 
-const wsLink = new WebSocketLink({
-  uri: environment.wsUrl,
-  options: {
-    reconnect: true,
-    connectionParams: () => {
-      const token = readToken();
-      return {
-        authToken: token,
-      }
-    },
-  }
+const wsLink = new TransportWSLink({
+  url: environment.wsUrl,
+  connectionParams: () => {
+    const token = readToken();
+    return {
+      authToken: token,
+    }
+  },
 });
 
 const authLink = setContext((_, { headers }) => {

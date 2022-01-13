@@ -25,7 +25,7 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
     @InjectRepository(Peripheral)
     private peripheralRepository: Repository<Peripheral>,
     private schedulerRegistry: SchedulerRegistry,
-    @Inject('AbstractHardware')
+    @Inject(AbstractHardware)
     private hardwareProvider,
     @Inject(HistoryService)
     private historyService: HistoryService,

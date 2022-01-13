@@ -18,6 +18,7 @@ import {Object3dReferencesModule} from "../object-3d-references/object-3d-refere
 import {PeripheralsModule} from "../peripherals/peripherals.module";
 import {BaseModule} from "../base/base.module";
 import {HistoryModule} from "../history/history.module";
+import {Context} from "graphql-ws";
 
 @Module({
   imports: [
@@ -38,9 +39,19 @@ import {HistoryModule} from "../history/history.module";
     }),
     GraphQLModule.forRoot({
       typePaths: ['./**/*.graphql'],
-      installSubscriptionHandlers: true,
       resolvers: {
         JSON: GraphQLJSON,
+      },
+      subscriptions: {
+        'graphql-ws': {
+          onConnect: (context: Context<any>) => {
+            const { connectionParams, extra } = context;
+            console.log('context', context);
+            // user validation will remain the same as in the example above
+            // when using with graphql-ws, additional context value should be stored in the extra field
+            extra.user = { user: {} };
+          },
+        },
       },
     }),
     AuthModule,
