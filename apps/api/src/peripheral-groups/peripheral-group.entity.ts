@@ -1,7 +1,8 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, ManyToOne, JoinColumn} from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, ManyToOne, JoinColumn, OneToMany} from 'typeorm';
 import {Peripheral} from '../peripherals/peripherals.entity'
 import {Object3dReference} from "../object-3d-references/object-3d-references.entity";
 import {TypeormLoader} from "type-graphql-dataloader";
+import {ProfileAuthorization} from "../profile-authorizations/profile-authorization.entity";
 
 export enum PeripheralGroupType {
   HEATING = "heating_system",
@@ -52,4 +53,7 @@ export class PeripheralGroup {
   @JoinColumn({ name: "Object3DReferenceID" })
   @TypeormLoader()
   Object3DReference: Object3dReference;
+
+  @OneToMany('ProfileAuthorization', 'PeripheralGroup')
+  Authorizations: ProfileAuthorization[];
 }

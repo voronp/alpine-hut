@@ -7,10 +7,17 @@ type Position {
   z: Float
 }
 
+type ProfileAuthorization {
+  ID: Int!
+  Access: String
+  PeripheralGroupID: Int
+}
+
 type Profile {
   ID: Int!
   Name: String
   Description: String
+  Authorizations: [ProfileAuthorization]
 }
 
 type User {
@@ -26,6 +33,7 @@ type Query {
   whoAmI: User
   peripheralGroupList: [PeripheralGroup]
   getPeripheralGroupsBy3DPart(view3DPart: String): [PeripheralGroup]
+  getProfile: Profile
 }
 
 type Mutation {

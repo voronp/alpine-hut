@@ -1,6 +1,6 @@
 
 /*
- * ------------------------------------------------------
+ * -------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
  * -------------------------------------------------------
  */
@@ -8,76 +8,86 @@
 /* tslint:disable */
 /* eslint-disable */
 export class Position {
-    x?: number;
-    y?: number;
-    z?: number;
+    x?: Nullable<number>;
+    y?: Nullable<number>;
+    z?: Nullable<number>;
+}
+
+export class ProfileAuthorization {
+    ID: number;
+    Access?: Nullable<string>;
+    PeripheralGroupID?: Nullable<number>;
 }
 
 export class Profile {
     ID: number;
-    Name?: string;
-    Description?: string;
+    Name?: Nullable<string>;
+    Description?: Nullable<string>;
+    Authorizations?: Nullable<Nullable<ProfileAuthorization>[]>;
 }
 
 export class User {
     ID: number;
-    Login?: string;
-    Email?: string;
-    Status?: number;
-    Role?: string;
-    Profile?: Profile;
+    Login?: Nullable<string>;
+    Email?: Nullable<string>;
+    Status?: Nullable<number>;
+    Role?: Nullable<string>;
+    Profile?: Nullable<Profile>;
 }
 
 export abstract class IQuery {
-    abstract whoAmI(): User | Promise<User>;
+    abstract whoAmI(): Nullable<User> | Promise<Nullable<User>>;
 
-    abstract peripheralGroupList(): PeripheralGroup[] | Promise<PeripheralGroup[]>;
+    abstract peripheralGroupList(): Nullable<Nullable<PeripheralGroup>[]> | Promise<Nullable<Nullable<PeripheralGroup>[]>>;
 
-    abstract getPeripheralGroupsBy3DPart(view3DPart?: string): PeripheralGroup[] | Promise<PeripheralGroup[]>;
+    abstract getPeripheralGroupsBy3DPart(view3DPart?: Nullable<string>): Nullable<Nullable<PeripheralGroup>[]> | Promise<Nullable<Nullable<PeripheralGroup>[]>>;
+
+    abstract getProfile(): Nullable<Profile> | Promise<Nullable<Profile>>;
 }
 
 export abstract class IMutation {
-    abstract addPeripheralGroup(Name: string, Data: JSON, Description?: string, Type?: string): PeripheralGroup | Promise<PeripheralGroup>;
+    abstract addPeripheralGroup(Name: string, Data: JSON, Description?: Nullable<string>, Type?: Nullable<string>): Nullable<PeripheralGroup> | Promise<Nullable<PeripheralGroup>>;
 
-    abstract activatePeripheralGroup(ID: number): PeripheralGroup | Promise<PeripheralGroup>;
+    abstract activatePeripheralGroup(ID: number): Nullable<PeripheralGroup> | Promise<Nullable<PeripheralGroup>>;
 
-    abstract deactivatePeripheralGroup(ID: number): PeripheralGroup | Promise<PeripheralGroup>;
+    abstract deactivatePeripheralGroup(ID: number): Nullable<PeripheralGroup> | Promise<Nullable<PeripheralGroup>>;
 }
 
 export abstract class ISubscription {
-    abstract peripheralUpdated(peripheralID: number): Peripheral | Promise<Peripheral>;
+    abstract peripheralUpdated(peripheralID: number): Nullable<Peripheral> | Promise<Nullable<Peripheral>>;
 }
 
 export class Peripheral {
     ID: number;
-    Name?: string;
-    Data?: JSON;
-    Type?: string;
-    Description?: string;
-    IsActive?: boolean;
-    Interface?: string;
-    LastUpdate?: Date;
-    Position?: Position;
-    Object3DReference?: Object3DReference;
+    Name?: Nullable<string>;
+    Data?: Nullable<JSON>;
+    Type?: Nullable<string>;
+    Description?: Nullable<string>;
+    IsActive?: Nullable<boolean>;
+    Interface?: Nullable<string>;
+    LastUpdate?: Nullable<Date>;
+    Position?: Nullable<Position>;
+    Object3DReference?: Nullable<Object3DReference>;
 }
 
 export class PeripheralGroup {
     ID: number;
-    Name?: string;
-    Data?: JSON;
-    Type?: string;
-    Description?: string;
-    Peripherals?: Peripheral[];
-    Object3DReference?: Object3DReference;
+    Name?: Nullable<string>;
+    Data?: Nullable<JSON>;
+    Type?: Nullable<string>;
+    Description?: Nullable<string>;
+    Peripherals?: Nullable<Nullable<Peripheral>[]>;
+    Object3DReference?: Nullable<Object3DReference>;
 }
 
 export class Object3DReference {
     ID: number;
-    Type?: string;
-    ActiveIn?: string;
-    Config?: JSON;
-    Peripherals?: Peripheral[];
-    PeripheralGroups?: PeripheralGroup[];
+    Type?: Nullable<string>;
+    ActiveIn?: Nullable<string>;
+    Config?: Nullable<JSON>;
+    Peripherals?: Nullable<Nullable<Peripheral>[]>;
+    PeripheralGroups?: Nullable<Nullable<PeripheralGroup>[]>;
 }
 
 export type JSON = any;
+type Nullable<T> = T | null;

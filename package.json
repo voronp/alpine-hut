@@ -69,6 +69,7 @@
     "reflect-metadata": "^0.1.13",
     "rpio": "^2.4.2",
     "rxjs": "~7.5.2",
+    "ts-morph": "^14.0.0",
     "tslib": "^2.0.0",
     "type-graphql": "^1.1.1",
     "type-graphql-dataloader": "^0.4.0",

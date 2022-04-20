@@ -5,6 +5,7 @@
     "types": ["node"],
     "emitDecoratorMetadata": true,
     "target": "es2015",
+    "skipLibCheck": true,
     "lib": [
       "es2018"
     ]
