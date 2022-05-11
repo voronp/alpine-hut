@@ -1,4 +1,4 @@
-import React, {useCallback} from "react";
+import React, {DependencyList, useCallback} from "react";
 import {GrassProceduralTexture} from "@babylonjs/procedural-textures";
 import {Space, Vector3} from "@babylonjs/core";
 import { useClick, useHover } from 'react-babylonjs';
@@ -11,7 +11,7 @@ export function use3DParts(scene) {
     material.diffuseTexture = texture;
     material.opacityTexture = texture;
     material.diffuseTexture.rotate = [new Vector3(1.0, 1.0, 0.5), Math.PI / 3.0, Space.LOCAL]
-  }, []);
+  }, [] as DependencyList);
 
 
   return {grassMaterial}

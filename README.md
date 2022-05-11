@@ -16,26 +16,10 @@ Below are our core plugins:
 
 - [React](https://reactjs.org)
   - `npm install --save-dev @nrwl/react`
-- Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
-- [Angular](https://angular.io)
-  - `npm install --save-dev @nrwl/angular`
 - [Nest](https://nestjs.com)
   - `npm install --save-dev @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `npm install --save-dev @nrwl/express`
-- [Node](https://nodejs.org)
-  - `npm install --save-dev @nrwl/node`
 
 There are also many [community plugins](https://nx.dev/nx-community) you could add.
-
-## Generate an application
-
-Run `nx g @nrwl/react:app my-app` to generate an application.
-
-> You can use any of the plugins above to generate applications as well.
-
-When using Nx, you can create multiple applications and libraries in the same workspace.
 
 ## Generate a library
 
@@ -90,6 +74,9 @@ Teams using Nx gain the advantage of building full-stack applications with their
 Visit [Nx Cloud](https://nx.app/) to learn more.
 
 # Some stuff to speedup things:
+
+## start full dev server
+`nx run-many --parallel --target=serve --all`
 
 ## to generate graphql types
 ```$xslt

@@ -8,7 +8,7 @@ import {
 // import { ApolloLink, Operation, FetchResult, Observable } from 'apollo-link'; // yarn add apollo-link
 
 import { print } from 'graphql';
-import { createClient, ClientOptions, Client } from 'graphql-ws';
+import {createClient, ClientOptions, Client, SubscribePayload} from 'graphql-ws';
 
 
 export class TransportWSLink extends ApolloLink {
@@ -22,7 +22,7 @@ export class TransportWSLink extends ApolloLink {
   public request(operation: Operation): Observable<FetchResult> {
     return new Observable((sink) => {
       return this.client.subscribe<FetchResult>(
-        { ...operation, query: print(operation.query) },
+        { ...operation, query: print(operation.query) } as SubscribePayload,
         {
           next: sink.next.bind(sink),
           complete: sink.complete.bind(sink),

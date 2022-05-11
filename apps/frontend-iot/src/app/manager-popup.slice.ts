@@ -7,7 +7,7 @@ export const MANAGER_POPUP_FEATURE_KEY = 'managerPopup';
 
 export interface ManagerPopupState {
   isOpened: boolean
-  data: any
+  data: unknown
 }
 
 export const initialManagerPopupState: ManagerPopupState = {

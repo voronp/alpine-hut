@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {DependencyList, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import 'primereact/resources/primereact.min.css';
 import 'primereact/resources/themes/saga-green/theme.css';
@@ -16,6 +16,7 @@ import {AppHeader, HeaderProps} from '@home/ui';
 import {useWhoAmIQuery} from "@home/data-access";
 import { Dialog } from 'primereact/dialog';
 import {ManagerPopup} from "./manager-popup";
+import {screenActions} from './screen.slice';
 
 export function App() {
   const dispatch = useDispatch();
@@ -33,7 +34,17 @@ export function App() {
         dispatch(logoutThunk());
       }
     });
-  }, [isAuthenticated]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated] as DependencyList);
+
+  useEffect(() => {
+    const listener = () => {
+      dispatch(screenActions.setHeight(window.innerHeight));
+      dispatch(screenActions.setWidth(window.innerWidth));
+    };
+    window.addEventListener('resize', listener);
+    return () => window.removeEventListener('resize', listener);
+  }, [] as DependencyList);
 
 console.log(authActions);
 
@@ -46,7 +57,7 @@ console.log(authActions);
     authError: loginError,
     onClickList: () => history.push('/list'),
     onClick3D: () => history.push('/view3d')
-  }
+  };
 
   return (
     <div className="app">
