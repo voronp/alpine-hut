@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import rpio from 'rpio';
+//import rpio from 'rpio';
+const rpio = {HIGH: '1', LOW: '0', OUTPUT: 'out', INPUT: 'in' };
 
 @Injectable()
 export class AbstractHardware {

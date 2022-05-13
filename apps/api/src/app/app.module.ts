@@ -10,7 +10,6 @@ import { UsersResolver } from '../users/users.resolver'
 
 import {environment} from '../environments/environment'
 import {AuthModule} from "../auth/auth.module";
-import {join} from "path";
 import {CommonModule} from "../common/common.module";
 import {PeripheralGroupsResolver} from "../peripheral-groups/peripheral-groups.resolver";
 import {PeripheralGroupsModule} from "../peripheral-groups/peripheral-groups.module";
@@ -44,8 +43,8 @@ import {Context} from "graphql-ws";
       },
       subscriptions: {
         'graphql-ws': {
-          onConnect: (context: Context<any>) => {
-            const { connectionParams, extra } = context;
+          onConnect: (context: Context<{user:Record<string, unknown>}>) => {
+            const { extra } = context;
             console.log('context', context);
             // user validation will remain the same as in the example above
             // when using with graphql-ws, additional context value should be stored in the extra field

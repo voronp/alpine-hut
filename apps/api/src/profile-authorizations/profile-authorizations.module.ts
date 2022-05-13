@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfileAuthorization } from './profile-authorization.entity';
 import { ProfileAuthorizationsResolver } from './profile-authorizations.resolver';
 
-// @ts-ignore
 @Module({
   providers: [ProfileAuthorizationsService, ProfileAuthorizationsResolver],
   imports: [TypeOrmModule.forFeature([ProfileAuthorization])],

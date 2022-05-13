@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, JoinColumn} from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from 'typeorm';
 
 import { Profile } from '../profiles/profile.entity'
 import {PeripheralGroup} from "../peripheral-groups/peripheral-group.entity";

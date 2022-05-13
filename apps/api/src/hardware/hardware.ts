@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { AbstractHardware } from "./abstract-hardware";
 import { readDevice } from './ds-1820';
-import rpio from 'rpio';
+//import rpio from 'rpio';
+const rpio = {open: (a,b,c) => true, write: (a,b) => true};
 
 @Injectable()
 export class Hardware extends AbstractHardware {
