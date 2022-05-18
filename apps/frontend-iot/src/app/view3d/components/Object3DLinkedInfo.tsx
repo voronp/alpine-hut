@@ -1,56 +1,31 @@
 import React, {
   useCallback,
-  useState,
-  useMemo,
   useRef,
-  useEffect,
-  forwardRef,
-  MutableRefObject,
-  useContext,
-  ComponentPropsWithRef,
-  RefObject,
   ReactNode,
 } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import {
-  Color3,
   Vector3,
-  Vector4,
-  CSG,
-  MeshBuilder,
-  StandardMaterial,
-  Scene,
-  Mesh,
-  SubMesh,
-  FadeInOutBehavior,
-  BoxBuilder,
-  HighlightLayer,
-  Texture,
-  PBRMetallicRoughnessMaterial,
-  ReflectionProbe,
-  MultiMaterial,
-  FresnelParameters,
-  PBRMaterial,
-  RenderTargetTexture, ShadowGenerator,
 } from "@babylonjs/core";
 import { Control } from '@babylonjs/gui';
-import { Box, Sphere } from 'react-babylonjs'
-import { useSubPointer} from "../visualHooks";
-import {selectHovered, selectSelected, selectSubSelected} from "../../pointer.slice";
 
 export interface Object3DLinkedInfoProps {
-  LinkedTo: Mesh
   children?: ReactNode
+  position: Vector3
+  offset: Vector3
+  index: number
 }
 
 export function Object3DLinkedInfo(props: Object3DLinkedInfoProps) {
-  const onFullScreenRef = useCallback(ref => {
-    lineRef.current.linkWithMesh(props.LinkedTo);
+  const pointRef = useCallback(ref => {
+    if (!lineRef.current || !objRef.current) return;
+    lineRef.current.linkWithMesh(ref);
     lineRef.current.connectedControl = objRef.current;
+    // bing the ui item to the 3d element
+    // objRef.current.linkWithMesh(ref);
   }, []);
   const objRef = useRef(null);
   const lineRef = useRef(null);
-  return (<adtFullscreenUi name='ui1' ref={onFullScreenRef}>
+  return (<>
     <rectangle
       isPointerBlocker={true}
       name={`linked-container`}
@@ -63,10 +38,20 @@ export function Object3DLinkedInfo(props: Object3DLinkedInfoProps) {
       linkOffsetY={30}
       ref={objRef}
       verticalAlignment={Control.VERTICAL_ALIGNMENT_TOP}
-      top={'10%'}
+      top={10 + props.index * 150}
     >
       {props.children}
     </rectangle>
     <babylon-line name="linked-line" alpha={0.5} lineWidth={5} dash={[5, 10]} ref={lineRef} />
-  </adtFullscreenUi>)
+    <box
+      ref={pointRef}
+      name="pointConnector"
+      width={0.01}
+      height={0.01}
+      depth={0.01}
+      position-x={props.position.x + props.offset.x}
+      position-y={props.position.y + props.offset.y}
+      position-z={props.position.z + props.offset.z}
+    />
+  </>)
 }

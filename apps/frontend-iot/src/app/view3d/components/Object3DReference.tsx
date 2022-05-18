@@ -1,40 +1,13 @@
 import React, {
-  useCallback,
-  useState,
-  useMemo,
   useRef,
-  useEffect,
-  forwardRef,
-  MutableRefObject,
-  useContext,
   ComponentPropsWithRef, ReactNode
 } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   Color3,
   Vector3,
-  Vector4,
-  CSG,
-  MeshBuilder,
-  StandardMaterial,
-  Scene,
-  Mesh,
-  SubMesh,
-  FadeInOutBehavior,
-  BoxBuilder,
-  HighlightLayer,
-  Texture,
-  PBRMetallicRoughnessMaterial,
-  ReflectionProbe,
-  MultiMaterial,
-  FresnelParameters,
-  PBRMaterial,
-  RenderTargetTexture, ShadowGenerator,
 } from "@babylonjs/core";
 import { Box, Sphere } from 'react-babylonjs'
 import { useSubPointer} from "../visualHooks";
-import { selectHovered, selectSelected, selectSubSelected } from "../../pointer.slice";
-import { Object3DLinkedInfo } from "./Object3DLinkedInfo";
 export interface Object3DReferenceProps {
   ID: number
   Type: string
@@ -86,15 +59,10 @@ export function Object3DReference(props: Object3DReferenceProps) {
     <Component ref={objRef} name={`ObjRefName${props.ID}`} {...convertConf(props.Config)}>
       <standardMaterial
         name={`ObjRefName${props.ID}-mat`}
-        diffuseColor={isSubHovered ? Color3.Yellow() : Color3.Gray()}
+        diffuseColor={Color3.Yellow()}
         specularColor={Color3.Black()}
-        alpha={isSubHovered ? 0.5 : 0.01}
+        alpha={0.5}
       />
     </Component>
-    {
-      isSubSelected && <Object3DLinkedInfo LinkedTo={objRef.current}>
-        {props.children}
-      </Object3DLinkedInfo>
-    }
   </>)
 }

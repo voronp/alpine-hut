@@ -42,6 +42,7 @@ import {SceneContext} from "react-babylonjs";
 import {OnPeripheralUpdatedDocument, Peripheral, usePeripheralGroupsBy3DPartLazyQuery} from "@home/data-access";
 import TreeNode from "primereact/treenode";
 import {Object3DReference} from "./Object3DReference";
+import {Object3DLinkedInfo} from "./Object3DLinkedInfo";
 import { PeripheralGroupInfo } from './PeripheralGroupInfo';
 // counter clock vice???
 const floor1Outer = [
@@ -222,6 +223,29 @@ const selectPartMap = {
 };
 
 const selectPartConfig = {
+  [viewParts.floor1]: {
+    hide: [meshIds.floor3, meshIds.floor2, meshIds.mainRoof, meshIds.basement2, meshIds.basement3],
+    highlight: [meshIds.basement],
+  },
+  [viewParts.floor2]: {
+    hide: [meshIds.floor3, meshIds.mainRoof, meshIds.basement3],
+    highlight: [meshIds.basement2],
+  },
+  [viewParts.floor3]: {
+    hide: [meshIds.mainRoof],
+    highlight: [meshIds.basement3],
+  },
+  [viewParts.veranda]: {
+    hide: [meshIds.verandaRoof],
+    highlight: [meshIds.basementVeranda],
+  },
+  [viewParts.fireplace]: {
+    hide: [meshIds.floor3, meshIds.floor2, meshIds.mainRoof, meshIds.basement2, meshIds.basement3],
+    highlight: [meshIds.fireplace],
+  },
+};
+
+const hoverPartConfig = {
   [viewParts.floor1]: {
     hide: [meshIds.floor3, meshIds.floor2, meshIds.mainRoof, meshIds.basement2, meshIds.basement3],
     highlight: [meshIds.basement],
@@ -1049,6 +1073,7 @@ export function House({highlightLayer}) {
       highlighted = selectPartConfig[selectPartMap[hovered]].highlight;
     }
     highlightMesh(highlighted);
+    // set selectedPart if selected mesh changed, will trigger backend for related data
     if (selectedPart !== selectPartMap[selected]) {
       setSelectedPart(selectPartMap[selected]);
     }
@@ -1056,11 +1081,19 @@ export function House({highlightLayer}) {
       if (!partRefs[meshId].current)
         return;
       const mesh = partRefs[meshId].current as Mesh;
+      // hide meshes configured as hidden for currently selected item
       if (selected && selectPartConfig[selectPartMap[selected]].hide.includes(meshId)) {
         mesh.isVisible = false;
         return;
       }
-      if (hovered && selectPartConfig[selectPartMap[hovered]].hide.includes(meshId)) {
+      // hide meshes configured as hidden for currently hovered item
+      if (hovered && hoverPartConfig[selectPartMap[hovered]].hide.includes(meshId)) {
+        mesh.isVisible = false;
+        return;
+      }
+      /*
+      do not make selected mesh semitransparent
+      if (selected === meshId) {
         if (mesh.subMeshes && mesh.subMeshes.length) {
           mesh.subMeshes.forEach((m) => {(m as SubMesh).getMaterial().alpha = 0.5})
         }
@@ -1070,6 +1103,8 @@ export function House({highlightLayer}) {
       if (mesh.subMeshes && mesh.subMeshes.length) {
         mesh.subMeshes.forEach((m) => {(m as SubMesh).getMaterial().alpha = 1})
       }
+      */
+      // to default state the rest of meshes
       mesh.isVisible = true;
       mesh.material.alpha = 1;
     })
@@ -1138,13 +1173,13 @@ export function House({highlightLayer}) {
     <VerandaRoof ref={partRefs[meshIds.verandaRoof]} scene={scene}/>
     <MainRoof ref={partRefs[meshIds.mainRoof]} scene={scene}/>
     <Fireplace ref={partRefs[meshIds.fireplace]} scene={scene} reflectOthers={Object.values(partRefs)} />
-    {
-      peripheralGroupsBy3DPart && peripheralGroupsBy3DPart.getPeripheralGroupsBy3DPart.map((v) => (
-        <Object3DReference
+    <adtFullscreenUi name='ui1'>
+    {peripheralGroupsBy3DPart && peripheralGroupsBy3DPart.getPeripheralGroupsBy3DPart.map((v, i) => (
+        <Object3DLinkedInfo 
           key={v.ID}
-          ID={v.ID}
-          Type={v.Object3DReference.Type}
-          Config={v.Object3DReference.Config}
+          position={v.Object3DReference.Config.Position}
+          offset={new Vector3(10, 0, 5)}
+          index={i}
         >
           <PeripheralGroupInfo
             ID={v.ID}
@@ -1154,6 +1189,17 @@ export function House({highlightLayer}) {
             Name={v.Name}
             Peripherals={v.Peripherals}
           />
+        </Object3DLinkedInfo>
+    ))}
+    </adtFullscreenUi>
+    {
+      peripheralGroupsBy3DPart && peripheralGroupsBy3DPart.getPeripheralGroupsBy3DPart.map((v) => (
+        <Object3DReference
+          key={v.ID}
+          ID={v.ID}
+          Type={v.Object3DReference.Type}
+          Config={v.Object3DReference.Config}
+        >
         </Object3DReference>
       ))
     }

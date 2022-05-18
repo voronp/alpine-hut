@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { Injectable } from '@nestjs/common';
-//import rpio from 'rpio';
-const rpio = {HIGH: '1', LOW: '0', OUTPUT: 'out', INPUT: 'in' };
+import rpio from 'rpio';
 
 @Injectable()
 export class AbstractHardware {
@@ -9,15 +9,9 @@ export class AbstractHardware {
   static OUTPUT = rpio.OUTPUT;
   static INPUT = rpio.INPUT;
 
-  openPIO(pio:number, mode:string, option:string) {
-
-  }
-  setHighPIO(pio:number) {
-
-  }
-  setLowPIO(pio:number) {
-
-  }
+  openPIO(pio:number, mode:string, option:string):void {}
+  setHighPIO(pio:number):void {}
+  setLowPIO(pio:number):void {}
   async getTemperature(id:string):Promise<number> {
     return 999;
   }
