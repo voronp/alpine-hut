@@ -5,14 +5,15 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import {PeripheralsModule} from "../peripherals/peripherals.module";
 import {PeripheralGroup} from "./peripheral-group.entity";
 import {HardwareModule} from "../hardware/hardware.module";
-import {ProfileAuthorizationsModule} from "../profile-authorizations/profile-authorizations.module";
+import { ProfilesModule } from '../profiles/profiles.module';
+import { ProfileAuthorizationsModule } from '../profile-authorizations/profile-authorizations.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([PeripheralGroup]),
     PeripheralsModule,
     HardwareModule,
-    ProfileAuthorizationsModule,
+    ProfilesModule,
   ],
   providers: [PeripheralGroupsService, ],
   controllers: [PeripheralGroupsController],

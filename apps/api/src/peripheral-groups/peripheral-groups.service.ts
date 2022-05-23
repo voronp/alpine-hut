@@ -35,7 +35,7 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
     return this.peripheralGroupRepository.find();
   }
 
-  async findBy3DPart(view3DPart: String): Promise<PeripheralGroup[]> {
+  async findBy3DPart(view3DPart: string): Promise<PeripheralGroup[]> {
     /*
     return this.peripheralGroupRepository.find({
       where: {
@@ -68,6 +68,18 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
 
   async add(pgData:{Name:string, Data: Record<string, unknown>, Description: string, Type: string}):Promise<PeripheralGroup> {
     const pg:PeripheralGroup = this.peripheralGroupRepository.create(pgData);
+    return this.peripheralGroupRepository.save(pg);
+  }
+
+  async update(id: number, pgData:{Name?:string, Data?: Record<string, unknown>, Description?: string}):Promise<PeripheralGroup> {
+    const pg:PeripheralGroup = await this.peripheralGroupRepository.findOne(id);
+    Object.entries(pgData).forEach(([k, v]) => {
+      if (k === 'Data') {
+        Object.entries(pgData.Data).forEach(([kd, vd]) => {
+          pg.Data[kd] = vd;
+        });
+      } else pg[k] = v;
+    })
     return this.peripheralGroupRepository.save(pg);
   }
 
@@ -124,7 +136,7 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
       const heaterPeripheral = pg.Peripherals.find((p) => p.Type === PeripheralType.HEATER);
       if (!sensorPeripheral || !heaterPeripheral) {
         // log invalid configuration
-        console.log(sensorPeripheral, heaterPeripheral);
+        console.log('error', sensorPeripheral, heaterPeripheral);
         throw new Error('Configuration is invalid, please update');
       }
       const activateHeaterMethod:string = heaterPeripheral.Data.Active === 'HIGH' ? 'setHighPIO' : 'setLowPIO';

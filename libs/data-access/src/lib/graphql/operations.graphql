@@ -22,6 +22,7 @@ query allPeripheralGroups {
     Description
     Type
     Object3DReference {
+      ID
       Type
       Config
     }
@@ -40,6 +41,7 @@ query allPeripheralGroups {
       }
       LastUpdate
       Object3DReference {
+        ID
         Type
         Config
       }
@@ -55,6 +57,7 @@ query peripheralGroupsBy3DPart($View3DPart: String) {
     Description
     Type
     Object3DReference {
+      ID
       Type
       Config
     }
@@ -73,6 +76,42 @@ query peripheralGroupsBy3DPart($View3DPart: String) {
       }
       LastUpdate
       Object3DReference {
+        ID
+        Type
+        Config
+      }
+    }
+  }
+}
+
+query peripheralGroupByID($ID: Int!) {
+  peripheralGroupByID(ID: $ID) {
+    ID
+    Name
+    Data
+    Description
+    Type
+    Object3DReference {
+      ID
+      Type
+      Config
+    }
+    Peripherals {
+      ID
+      Name
+      Type
+      Interface
+      IsActive
+      Description
+      Data
+      Position {
+        x
+        y
+        z
+      }
+      LastUpdate
+      Object3DReference {
+        ID
         Type
         Config
       }
@@ -90,11 +129,54 @@ mutation addPeripheralGroup($Name: String!, $Data: JSON!, $Description: String, 
   }
 }
 
+mutation updatePeripheralGroup($PeripheralGroup: JSON!) {
+  updatePeripheralGroup(PeripheralGroup: $PeripheralGroup) {
+    ID
+    Name
+    Data
+    Description
+    Type
+  }
+}
+
+mutation activatePeripheralGroup($ID: Int!) {
+  activatePeripheralGroup(ID: $ID) {
+    ID
+    Name
+    Data
+    Description
+    Type
+  }
+}
+
+mutation deactivatePeripheralGroup($ID: Int!) {
+  activatePeripheralGroup(ID: $ID) {
+    ID
+    Name
+    Data
+    Description
+    Type
+  }
+}
+
 subscription onPeripheralUpdated($PeripheralID: Int!) {
   peripheralUpdated(peripheralID: $PeripheralID) {
     ID
     Data
     LastUpdate
     IsActive
+  }
+}
+
+query getProfileAuthorization {
+  getProfile {
+		ID
+    Name
+    Description
+    IsAdmin
+    Authorizations {
+      Access
+      PeripheralGroupID
+    }
   }
 }

@@ -20,7 +20,7 @@ export function Object3DLinkedInfo(props: Object3DLinkedInfoProps) {
     if (!lineRef.current || !objRef.current) return;
     lineRef.current.linkWithMesh(ref);
     lineRef.current.connectedControl = objRef.current;
-    // bing the ui item to the 3d element
+    // bind the ui item to the 3d element
     // objRef.current.linkWithMesh(ref);
   }, []);
   const objRef = useRef(null);

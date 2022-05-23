@@ -15,6 +15,9 @@ export class Profile {
   @Column()
   Description: string;
 
+  @Column()
+  IsAdmin: boolean
+
   @OneToMany(() => User, user => user.Profile)
   @TypeormLoader()
   Users: User[];

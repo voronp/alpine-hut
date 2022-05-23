@@ -14,7 +14,7 @@ export class UsersResolver {
   @Query(returns => User)
   @UseGuards(GqlAuthGuard)
   async whoAmI(@CurrentUser() user: User) {
-    console.log(user)
+    // console.log(user)
     return user
   }
 

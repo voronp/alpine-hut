@@ -61,7 +61,7 @@ export interface PeripheralGroupInfoProps {
 export function PeripheralGroupInfo(props: PeripheralGroupInfoProps) {
   const showActiveStatus = 'IsActive' in props.Data;
   const dispatch = useDispatch();
-  const onClick = () => dispatch(managerPopupActions.openPopup({ ...props, [IPeripheralGroupInfoProps]: true }));
+  const onClick = () => dispatch(managerPopupActions.openItemPopup({ ID: props.ID, Type: 'PeripheralGroup', header: props.Name }));
   return (<stackPanel
     name={`stack-pg-${props.ID}`}
     verticalAlignment={Control.VERTICAL_ALIGNMENT_TOP}

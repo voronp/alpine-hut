@@ -17,6 +17,7 @@ type Profile {
   ID: Int!
   Name: String
   Description: String
+  IsAdmin: Boolean
   Authorizations: [ProfileAuthorization]
 }
 
@@ -31,6 +32,7 @@ type User {
 
 type Query {
   whoAmI: User
+  peripheralGroupByID(ID: Int!): PeripheralGroup
   peripheralGroupList: [PeripheralGroup]
   getPeripheralGroupsBy3DPart(view3DPart: String): [PeripheralGroup]
   getProfile: Profile
@@ -38,6 +40,7 @@ type Query {
 
 type Mutation {
   addPeripheralGroup(Name: String!, Data: JSON!, Description: String, Type: String): PeripheralGroup
+  updatePeripheralGroup(PeripheralGroup: JSON): PeripheralGroup
   activatePeripheralGroup(ID: Int!): PeripheralGroup
   deactivatePeripheralGroup(ID: Int!): PeripheralGroup
 }

@@ -17,6 +17,8 @@ import { readToken } from './app/token';
 
 import { BrowserRouter } from 'react-router-dom';
 
+import { store, Context } from './store';
+
 const httpLink = createHttpLink({
   uri: environment.gqlUrl,
 });
@@ -59,10 +61,23 @@ const splitLink = split(
 
 const client = new ApolloClient({
   link: splitLink,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      PeripheralGroup: {
+        keyFields: ["ID"],
+      },
+      Peripheral: {
+        keyFields: ["ID"],
+      },
+      Object3DReference: {
+        keyFields: ["ID"],
+      },
+      Profile: {
+        keyFields: ["ID"],
+      },
+    },
+  }),
 });
-
-import { store, Context } from './store';
 
 ReactDOM.render(
   <Provider store={store}>

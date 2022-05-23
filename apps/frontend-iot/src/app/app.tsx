@@ -20,6 +20,7 @@ import {screenActions} from './screen.slice';
 
 export function App() {
   const dispatch = useDispatch();
+  const isModalOpened = useSelector(state => selectManagerPopupIsOpened(state));
   const isAuthenticated = useSelector(state => getAuthState(state).isAuthenticated);
   const isAuthLoading = useSelector(state => getAuthState(state).loadingStatus);
   const loginError = useSelector(state => getAuthState(state).error);
@@ -46,8 +47,6 @@ export function App() {
     return () => window.removeEventListener('resize', listener);
   }, [] as DependencyList);
 
-console.log(authActions);
-
   const headerProps:HeaderProps = {
     onLogout: () => dispatch(logoutThunk()),
     onLogin: (login, password) => dispatch(loginThunk({login, password})),
@@ -69,11 +68,11 @@ console.log(authActions);
           authError ? <div>Please login</div> :
             loading ? <i className="pi pi-spin pi-spinner" style={{'fontSize': '2em'}}/> : <>
               <Route path="/list" component={PeripheralList} />
-              <Route path="/view3d" children={({ match }) => (<View3d isActive={match}/>)} />
+              <Route path="/view3d" children={({ match }) => (<View3d isActive={match && match.path === '/view3d' && !isModalOpened}/>)} />
             </>
         }
       </main>
-      <ManagerPopup/>
+      { !authError && !loading && <ManagerPopup/> }
       <div className="footer flex">
         footer
       </div>

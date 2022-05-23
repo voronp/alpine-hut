@@ -23,6 +23,7 @@ export class Profile {
     ID: number;
     Name?: Nullable<string>;
     Description?: Nullable<string>;
+    IsAdmin?: Nullable<boolean>;
     Authorizations?: Nullable<Nullable<ProfileAuthorization>[]>;
 }
 
@@ -38,6 +39,8 @@ export class User {
 export abstract class IQuery {
     abstract whoAmI(): Nullable<User> | Promise<Nullable<User>>;
 
+    abstract peripheralGroupByID(ID: number): Nullable<PeripheralGroup> | Promise<Nullable<PeripheralGroup>>;
+
     abstract peripheralGroupList(): Nullable<Nullable<PeripheralGroup>[]> | Promise<Nullable<Nullable<PeripheralGroup>[]>>;
 
     abstract getPeripheralGroupsBy3DPart(view3DPart?: Nullable<string>): Nullable<Nullable<PeripheralGroup>[]> | Promise<Nullable<Nullable<PeripheralGroup>[]>>;
@@ -47,6 +50,8 @@ export abstract class IQuery {
 
 export abstract class IMutation {
     abstract addPeripheralGroup(Name: string, Data: JSON, Description?: Nullable<string>, Type?: Nullable<string>): Nullable<PeripheralGroup> | Promise<Nullable<PeripheralGroup>>;
+
+    abstract updatePeripheralGroup(PeripheralGroup?: Nullable<JSON>): Nullable<PeripheralGroup> | Promise<Nullable<PeripheralGroup>>;
 
     abstract activatePeripheralGroup(ID: number): Nullable<PeripheralGroup> | Promise<Nullable<PeripheralGroup>>;
 

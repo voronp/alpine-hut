@@ -18,6 +18,8 @@ import {PeripheralsModule} from "../peripherals/peripherals.module";
 import {BaseModule} from "../base/base.module";
 import {HistoryModule} from "../history/history.module";
 import {Context} from "graphql-ws";
+import { ProfileAuthorizationsModule } from '../profile-authorizations/profile-authorizations.module';
+import { ProfilesModule } from '../profiles/profiles.module';
 
 @Module({
   imports: [
@@ -33,7 +35,7 @@ import {Context} from "graphql-ws";
       entities: [
 
       ],
-      logging: true,
+      logging: false,
       //synchronize: true,
     }),
     GraphQLModule.forRoot({
@@ -45,7 +47,6 @@ import {Context} from "graphql-ws";
         'graphql-ws': {
           onConnect: (context: Context<{user:Record<string, unknown>}>) => {
             const { extra } = context;
-            console.log('context', context);
             // user validation will remain the same as in the example above
             // when using with graphql-ws, additional context value should be stored in the extra field
             extra.user = { user: {} };
@@ -60,6 +61,7 @@ import {Context} from "graphql-ws";
     Object3dReferencesModule,
     BaseModule,
     HistoryModule,
+    ProfilesModule,
   ],
   controllers: [AppController],
   providers: [
