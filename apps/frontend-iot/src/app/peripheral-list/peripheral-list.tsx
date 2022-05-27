@@ -37,7 +37,7 @@ export function PeripheralList(props: PeripheralListProps) {
   })) : []
   return (
     <div>
-      <TreeTable value={nodes} >
+      <TreeTable value={nodes} loading={loading}>
         <Column field="Name" header="Name" expander />
         <Column field="Type" header="Type"  />
         <Column field="Data" header="Data"  />

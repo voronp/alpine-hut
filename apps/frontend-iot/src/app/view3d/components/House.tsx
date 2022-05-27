@@ -268,6 +268,8 @@ const hoverPartConfig = {
   },
 };
 
+export const housePosition = new Vector3(10, 0, 5);
+
 export const woodSidingMaterial = ({scene, wAng=null, uScale=null, vScale=null}) => {
   const csgMeshMaterial = new StandardMaterial('material'+(Math.random()*1000).toFixed(0), scene);
   csgMeshMaterial.bumpTexture = new Texture(wall1Normal, scene);
@@ -1045,7 +1047,7 @@ export function House({highlightLayer}) {
     data: peripheralGroupsBy3DPart,
     subscribeToMore: subscribeToPeripheralGroupUpdate,
   }] = usePeripheralGroupsBy3DPartLazyQuery();
-  const highlightMesh = (id) => {
+  const highlightMesh = (id:number) => {
     if(id && partRefs[id].current && highlightLayer.current && !(highlightLayer.current as HighlightLayer).hasMesh(partRefs[id].current)) {
       highlightLayer.current.addMesh(partRefs[id].current, Color3.Green());
     }
@@ -1178,7 +1180,7 @@ export function House({highlightLayer}) {
         <Object3DLinkedInfo 
           key={v.ID}
           position={v.Object3DReference.Config.Position}
-          offset={new Vector3(10, 0, 5)}
+          offset={housePosition}
           index={i}
         >
           <PeripheralGroupInfo

@@ -150,7 +150,7 @@ mutation activatePeripheralGroup($ID: Int!) {
 }
 
 mutation deactivatePeripheralGroup($ID: Int!) {
-  activatePeripheralGroup(ID: $ID) {
+  deactivatePeripheralGroup(ID: $ID) {
     ID
     Name
     Data

@@ -1,4 +1,4 @@
-import React, {DependencyList, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import 'primereact/resources/primereact.min.css';
 import 'primereact/resources/themes/saga-green/theme.css';
@@ -35,8 +35,7 @@ export function App() {
         dispatch(logoutThunk());
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated] as DependencyList);
+  }, [isAuthenticated, dispatch, refetchWhoAmI]);
 
   useEffect(() => {
     const listener = () => {
@@ -45,7 +44,7 @@ export function App() {
     };
     window.addEventListener('resize', listener);
     return () => window.removeEventListener('resize', listener);
-  }, [] as DependencyList);
+  }, [dispatch]);
 
   const headerProps:HeaderProps = {
     onLogout: () => dispatch(logoutThunk()),

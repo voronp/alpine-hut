@@ -11,7 +11,7 @@ const getPeripheralGroupComponent = (componentName:string) => {
 }
 
 export function PeripheralGroupForm (props: {
-    profile: Profile, 
+    permissions: AuthorizationDict, 
     data:PeripheralGroup, 
     setAlreadySaved:(v:boolean) => void, 
     setHasChanges:(v:boolean) => void, 
@@ -24,7 +24,7 @@ export function PeripheralGroupForm (props: {
   const [updatePeripheralGroup, {data: updatedPG, loading: isLoadingUpdatedPG}] = useUpdatePeripheralGroupMutation();
   const [activatePeripheralGroup, {loading: isLoadingActivationPG}] = useActivatePeripheralGroupMutation();
   const [deactivatePeripheralGroup, {loading: isLoadingDeactivationPG}] = useDeactivatePeripheralGroupMutation();
-  const { setHasChanges, setAlreadySaved, setIsSaveLoading, saveNode } = props;
+  const { setHasChanges, setAlreadySaved, setIsSaveLoading, saveNode, permissions: access } = props;
   useEffect(() => {
     const f = async () => {
       // mutate peripheral group thru graphql
@@ -39,13 +39,6 @@ export function PeripheralGroupForm (props: {
       return () => saveNode.removeEventListener('click', f);
     }
   }, [saveNode, setIsSaveLoading, updatePeripheralGroup, setHasChanges, setAlreadySaved, props.data.ID, pgToUpdate])
-  const access = useMemo(():AuthorizationDict => props.profile.Authorizations
-      .filter(v => v.PeripheralGroupID === props.data.ID)
-      .reduce((acc, v) => ({...acc, [v.Access]: true}), {
-          Read: props.profile.IsAdmin,
-          Setup: props.profile.IsAdmin,
-          Activate: props.profile.IsAdmin,
-      }), [props.data.ID, props.profile.Authorizations, props.profile.IsAdmin]);
   const onEnable =  async (v:boolean) => {
     // mutate pg state to enable hardware
     v ? await activatePeripheralGroup({variables: {ID: props.data.ID}}) : await deactivatePeripheralGroup({variables: {ID: props.data.ID}});

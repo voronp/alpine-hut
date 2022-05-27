@@ -246,7 +246,7 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
 
   async savePeripheral(peripheral: Peripheral) {
     await this.peripheralRepository.save(peripheral);
-    console.warn(peripheral);
+    // console.warn(peripheral);
     return this.pubSub.publish('peripheralUpdated', { peripheralUpdated: peripheral });
   }
 }

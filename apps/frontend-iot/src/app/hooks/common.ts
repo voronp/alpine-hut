@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { AuthorizationDict } from '@home/ui';
+import { useGetProfileAuthorizationQuery } from '@home/data-access';
 
 export function useManagerPopupSaveBtn():{
   saveBtnLabel:string,
@@ -42,4 +44,17 @@ export function useManagerPopupSaveBtn():{
       setHasChanges,
       setIsSaveLoading,
     };
+}
+
+export function useAuthorizationDict(PeripheralGroupID:number) {
+  const { data, loading, error } = useGetProfileAuthorizationQuery();
+  const { getProfile: profileData } = data || { getProfile: {Authorizations: [], IsAdmin: false}};
+  const res = useMemo(():AuthorizationDict => profileData.Authorizations
+      .filter(v => v.PeripheralGroupID === PeripheralGroupID)
+      .reduce((acc, v) => ({...acc, [v.Access]: true}), {
+          Read: profileData.IsAdmin,
+          Setup: profileData.IsAdmin,
+          Activate: profileData.IsAdmin,
+      }), [PeripheralGroupID, profileData.Authorizations, profileData.IsAdmin]);
+  return { data: res, loading, error };
 }

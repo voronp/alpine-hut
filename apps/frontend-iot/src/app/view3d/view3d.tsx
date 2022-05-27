@@ -1,10 +1,11 @@
 import React, {useRef, useState, useEffect, useCallback, useContext} from 'react'
 import { ApolloProvider, ApolloContextValue, getApolloContext } from '@apollo/client';
 import { Provider } from 'react-redux';
-import {Engine, Scene, GlowLayer, SceneContext} from 'react-babylonjs'
-import { Vector3, Color3, Scene as BScene, CubeTexture } from '@babylonjs/core'
-import {use3DParts, usePointer} from './visualHooks'
-import {House} from './components/House'
+import {Engine, Scene, GlowLayer, SceneContext} from 'react-babylonjs';
+import { Vector3, Color3, Scene as BScene, CubeTexture } from '@babylonjs/core';
+import { Nullable } from '@babylonjs/core/types.js';
+import {use3DParts, usePointer} from './visualHooks';
+import {House, housePosition} from './components/House';
 import {store} from '../../store';
 import styles from  './view3d.module.scss';
 
@@ -51,10 +52,12 @@ export function View3d(props: View3dProps) {
       window.dispatchEvent(new Event('resize'));
     }
   }, [props.isActive])
-
+  const engineRef = useCallback((eng) => {
+    console.log('eng', eng);
+  }, []);
   return (
     <div className={styles.wrapper} style={{display: props.isActive ? 'initial' : 'none'}}>
-      <Engine antialias canvasId='babylonJS' adaptToDeviceRatio={true} canvasStyle={{width: '100%', height: '100%'}} >
+      <Engine ref={engineRef} antialias canvasId='babylonJS' adaptToDeviceRatio={true} canvasStyle={{width: '100%', height: '100%'}} >
         <Scene onSceneMount={onSceneMounted}>
           <highlightLayer ref={highlightLayerEL} name="highlight"/>
           <freeCamera ref={cameraRef}  name="camera1" rotation={new Vector3(10,-10,10)} position={new Vector3(0, 10, 0)}/>
@@ -81,7 +84,7 @@ export function View3d(props: View3dProps) {
           <ground name='ground' width={40} height={40} subdivisions={1} receiveShadows={true}>
             <standardMaterial name='groundMat' specularColor={Color3.Black()}  ref={grassMaterial} />
           </ground>
-          <box name="home_group" position={new Vector3(10, 0, 5)} width={0.01} height={0.01} depth={0.01}>
+          <box name="home_group" position={housePosition} width={0.01} height={0.01} depth={0.01}>
             <Provider store={store}>
               <ApolloProvider client={client}>
                 <House highlightLayer={highlightLayerEL}/>

@@ -1,13 +1,14 @@
 import {useDispatch, useSelector} from 'react-redux';
 import {managerPopupActions, selectManagerPopupData, selectManagerPopupHeader, selectManagerPopupIsOpened, selectManagerPopupItem} from "./manager-popup.slice";
-import {Dialog} from "primereact/dialog";
+import { Dialog } from "primereact/dialog";
+import { Message } from 'primereact/message'
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { BlockUI } from 'primereact/blockui';
 import { Button } from 'primereact/button';
 import React, { useCallback, useState } from "react";
 import {PeripheralGroup, Profile, useGetProfileAuthorizationQuery} from '@home/data-access';
 import { PeripheralGroupFormConnected } from './components/PeripheralGroupFormConnected';
-import { useManagerPopupSaveBtn } from './hooks/common';
+import { useAuthorizationDict, useManagerPopupSaveBtn } from './hooks/common';
 
 export function ManagerPopup() {
   const [saveNode, setSaveNode] = useState(null);
@@ -17,7 +18,6 @@ export function ManagerPopup() {
   const managerPopupData = useSelector(state => selectManagerPopupData(state));
   const managerPopupItem = useSelector(state => selectManagerPopupItem(state));
   const managerPopupHeader = useSelector(state => selectManagerPopupHeader(state));
-  const { data, loading, error } = useGetProfileAuthorizationQuery();
   const { 
     saveBtnLabel, 
     saveBtnIcon, 
@@ -28,10 +28,8 @@ export function ManagerPopup() {
     setHasChanges,
     setIsSaveLoading,
    } = useManagerPopupSaveBtn();
-  if (loading) return <BlockUI blocked template={<ProgressSpinner/>} fullScreen />
-  if (error) return <Dialog modal visible onHide={() => undefined}>{error.message}</Dialog>
-  const { getProfile: profileData } = data;
-  return isModalOpened && profileData && <Dialog
+  const {data: permissions, loading, error} = useAuthorizationDict(managerPopupItem?.ID)
+  return isModalOpened && <Dialog
     breakpoints={{'960px': '75vw', '640px': '100vw'}}
     style={{maxWidth: '800px'}}
     header={managerPopupHeader}
@@ -45,10 +43,11 @@ export function ManagerPopup() {
     />}
     visible={isModalOpened}
     onHide={() => dispatch(managerPopupActions.closePopup())}
-  >
-    { managerPopupItem && managerPopupItem.Type === 'PeripheralGroup' && <PeripheralGroupFormConnected
+  > { loading && <BlockUI blocked template={<ProgressSpinner/>} /> }
+    { error && <Message severity="error" text={error.message} /> }
+    { !loading && !error && managerPopupItem && managerPopupItem.Type === 'PeripheralGroup' && <PeripheralGroupFormConnected
       ID={managerPopupItem.ID}
-      profile={profileData as Profile}
+      permissions={permissions}
       setAlreadySaved={setAlreadySaved}
       setHasChanges={setHasChanges}
       setIsSaveLoading={setIsSaveLoading}
