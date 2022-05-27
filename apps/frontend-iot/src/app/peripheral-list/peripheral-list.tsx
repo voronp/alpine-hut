@@ -1,48 +1,30 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
-import { TreeTable } from 'primereact/treetable';
-import { Column } from 'primereact/column';
+import { SelectButton } from 'primereact/selectbutton';
 import styles from './peripheral-list.module.scss';
 import { useAllPeripheralGroupsQuery } from "@home/data-access";
-import TreeNode from "primereact/treenode";
+import { Message } from "primereact/message";
+import PeripheralListAccordion from '../components/PeripheralListAccordion';
+import PeripheralListTreeTable from '../components/PeripheralListTreeTable';
 
-/* eslint-disable-next-line */
-export interface PeripheralListProps {}
+const options = [
+  {name: 'Accordion', value: 1},
+  {name: 'Tree Table', value: 2},
+];
 
-const getActions = (peripheral) => ({
-  'on': () => {console.log('on')},
-  'off': () => {console.log('off')},
-})
-
-export function PeripheralList(props: PeripheralListProps) {
+export function PeripheralList() {
   const {data, error: listError, loading, refetch: refetchPeripheralGroups} = useAllPeripheralGroupsQuery()
-  const nodes = data ? data.peripheralGroupList.map<TreeNode>(v => ({
-      key: `G_${v.ID}`,
-      data: {
-        Name: v.Name,
-        Type: v.Type,
-        Data: JSON.stringify(v.Data),
-        Actions: JSON.stringify(getActions(v)),
-      },
-      children: v.Peripherals.map<TreeNode>(p => ({
-        key: `P_${p.ID}`,
-        data: {
-          Name: p.Name,
-          Type: p.Type,
-          Data: JSON.stringify(p.Data),
-          Actions: JSON.stringify(getActions(p)),
-        },
-        children: []
-      })),
-  })) : []
+  const [selectedUI, setSelectedUI] = useState(options[0].value);
+  const [selectedPG, setSelectedPG] = useState(undefined);
+  const onSelect = useCallback((ID) => setSelectedPG(ID), [setSelectedPG]);
   return (
-    <div>
-      <TreeTable value={nodes} loading={loading}>
-        <Column field="Name" header="Name" expander />
-        <Column field="Type" header="Type"  />
-        <Column field="Data" header="Data"  />
-        <Column field="Actions" header="Actions"  />
-      </TreeTable>
+    <div className={styles.list}>
+      <div className={styles.header}><SelectButton value={selectedUI} options={options} onChange={(e) => setSelectedUI(e.value)} optionLabel="name" /></div>
+      <div className={styles.content}>
+        { listError && <Message severity="error" text={listError.message} /> }
+        { data && data.peripheralGroupList && selectedUI === 1 && <PeripheralListAccordion loading={loading} items={data.peripheralGroupList} onSelect={onSelect} selectedID={selectedPG} /> }
+        { data && data.peripheralGroupList && selectedUI === 2 && <PeripheralListTreeTable loading={loading} items={data.peripheralGroupList} /> }
+      </div>
     </div>
   );
 }
