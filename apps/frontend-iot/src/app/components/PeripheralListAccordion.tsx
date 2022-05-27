@@ -5,6 +5,7 @@ import { BlockUI } from 'primereact/blockui';
 import { Tag } from 'primereact/tag';
 import { ProgressSpinner } from 'primereact/progressspinner'
 import { PeripheralGroup } from '@home/data-access';
+import styles from './PeripheralListAccordion.module.scss'
 
 export interface PeripheralListAccProps {
   loading:boolean
@@ -16,12 +17,12 @@ export interface PeripheralListAccProps {
 function AccHeader(props:PeripheralGroup) {
   let icon = "pi pi-bolt";
   if (props.Type === 'heating_system') icon = "pi pi-sun";
-  return (<>
+  return (<div className={styles.header}>
     <i className={icon}></i>
-    <span>{props.Name}</span>
+    <span className={styles['header-name']}>{props.Name}</span>
     { !props.Data.IsActive && <Tag className="mr-2" icon="pi pi-times" severity="info" value="Disabled"></Tag> }
     { props.Data.IsActive && <Tag className="mr-2" icon="pi pi-check" severity="success" value="Enabled"></Tag> }
-  </>)
+  </div>)
 }
 
 export function PeripheralListAccordion(props: PeripheralListAccProps) {

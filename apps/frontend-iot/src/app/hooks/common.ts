@@ -19,21 +19,21 @@ export function useManagerPopupSaveBtn():{
       const res = {
         saveBtnLabel: 'Save', 
         saveBtnIcon: 'pi', 
-        saveBtnClass: 'p-button-raised',
+        saveBtnClass: 'button-raised',
         saveBtnDisabled: true,
       }
       if (hasChanges) {
         res.saveBtnDisabled = false;
-        res.saveBtnClass += ' p-button-danger';
+        res.saveBtnClass += ' button-danger';
         res.saveBtnIcon += ' pi-save';
       } else if (alreadySaved && !hasChanges) {
         res.saveBtnLabel = 'Done';
         res.saveBtnDisabled = true;
-        res.saveBtnClass += ' p-button-success';
+        res.saveBtnClass += ' button-success';
         res.saveBtnIcon += ' pi-check';
       } else {
         res.saveBtnIcon = '';
-        res.saveBtnClass += 'p-button-secondary'
+        res.saveBtnClass += 'button-secondary'
       }
       return res;
     }, [alreadySaved, hasChanges]);

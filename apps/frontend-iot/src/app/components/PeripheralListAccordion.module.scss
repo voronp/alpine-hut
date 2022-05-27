@@ -1,0 +1,11 @@
+.header {
+    display: flex;
+    align-items: center;
+    &> * {
+        margin: 0 10px;
+    }
+}
+
+.header-name {
+    word-wrap: break-word;
+}

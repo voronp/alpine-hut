@@ -2,14 +2,15 @@
     display: flex;
     flex-flow: column;
     align-items: center;
+    margin: 10px 0;
 }
 
 .header {
-    padding: 10px;
+    margin: 10px 0;
 }
 
 .content {
-    padding: 10px;
+    margin: 10px 0;
     width: 100%;
     max-width: 800px;
 }

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Toolbar, ToolbarProps} from 'primereact/toolbar';
 import {Button, ButtonProps} from 'primereact/button';
 import {ConfirmPopup} from 'primereact/confirmpopup';
@@ -6,6 +6,7 @@ import { Toast } from 'primereact/toast';
 import {Dialog} from "primereact/dialog";
 import { Password } from 'primereact/password';
 import { InputText } from 'primereact/inputtext';
+import { Menu } from 'primereact/menu';
 import './header.scss';
 
 const leftContents = (props) => (
@@ -41,17 +42,31 @@ export function AppHeader({onLogin, onLogout, isAuthenticated, isAuthLoading, au
   const [logoutConfirmVisible, setLogoutConfirmVisible] = useState(false)
   const [userName, setUserName] = useState('')
   const [userPassword, setUserPassword] = useState('')
+  const menu = useRef(null);
+  const menuOptions = useMemo(() => ([
+    {
+      label: '3d view',
+      icon: 'pi pi-home',
+      command: onClick3D,
+    },
+    {
+      label: 'List',
+      icon: 'pi pi-list',
+      command: onClickList,
+    },
+  ]), [onClick3D, onClickList]);
   const rightContents = (p) => {
     return (<React.Fragment>
-      <Button label="3d view" icon="pi pi-home" className="p-d-sm-block p-d-none" onClick={onClick3D} />
-      <Button label="List" icon="pi pi-list" className="p-d-sm-block p-d-none" onClick={onClickList} />
+      <Button label="3d view" icon="pi pi-home" className="sm:block hidden" onClick={onClick3D} />
+      <Button label="List" icon="pi pi-list" className="sm:block hidden" onClick={onClickList} />
       <Button
         icon={"pi "+(isAuthLoading ? ' pi-spin pi-spinner ' : isAuthenticated ? ' pi-sign-out' : ' pi-user')}
-        className="p-mr-2"
+        className="mr-2"
         label={isAuthenticated ? authUserName || '' : ''}
         onClick={() => setLogoutConfirmVisible(true)}
       />
-      <Button icon="pi pi-bars" className="p-d-sm-none p-mr-2 p-d-block"/>
+      <Button icon="pi pi-bars" className="sm:hidden mr-2 block" onClick={(event) => menu.current.toggle(event)}/>
+      <Menu model={menuOptions} popup ref={menu} id="popup_menu" />
     </React.Fragment>)
   };
   return (<>
@@ -71,8 +86,8 @@ export function AppHeader({onLogin, onLogout, isAuthenticated, isAuthLoading, au
         }
       >
         <form onSubmit={(e) => {onLogin(userName, userPassword); e.preventDefault(); return false;}}>
-          <div className="p-inputgroup p-p-1">
-              <span className="p-inputgroup-addon">
+          <div className="inputgroup p-1">
+              <span className="inputgroup-addon">
                   <i className="pi pi-user"/>
               </span>
               <InputText
@@ -85,8 +100,8 @@ export function AppHeader({onLogin, onLogout, isAuthenticated, isAuthLoading, au
                 autoComplete="on"
               />
           </div>
-          <div className="p-inputgroup p-p-1">
-              <span className="p-inputgroup-addon">
+          <div className="inputgroup p-1">
+              <span className="inputgroup-addon">
                   <i className="pi pi-lock"/>
               </span>
               <Password
