@@ -52,7 +52,8 @@
           },
           "outputs": ["coverage/apps/api"]
         }
-      }
+      },
+      "tags": []
     },
     "data-access": {
       "root": "libs/data-access",
@@ -84,7 +85,8 @@
           },
           "outputs": ["coverage/libs/data-access"]
         }
-      }
+      },
+      "tags": []
     },
     "frontend-iot": {
       "root": "apps/frontend-iot",
@@ -160,7 +162,8 @@
           },
           "outputs": ["coverage/apps/frontend-iot"]
         }
-      }
+      },
+      "tags": []
     },
     "frontend-iot-e2e": {
       "root": "apps/frontend-iot-e2e",
@@ -186,7 +189,9 @@
             "lintFilePatterns": ["apps/frontend-iot-e2e/**/*.{js,ts}"]
           }
         }
-      }
+      },
+      "tags": [],
+      "implicitDependencies": ["frontend-iot"]
     },
     "ui": {
       "root": "libs/ui",
@@ -208,27 +213,8 @@
           },
           "outputs": ["coverage/libs/ui"]
         }
-      }
-    }
-  },
-  "cli": {
-    "defaultCollection": "@nrwl/react"
-  },
-  "schematics": {
-    "@nrwl/react": {
-      "application": {
-        "style": "scss",
-        "linter": "eslint",
-        "babel": true
       },
-      "component": {
-        "style": "scss"
-      },
-      "library": {
-        "style": "scss",
-        "linter": "eslint"
-      }
+      "tags": []
     }
-  },
-  "defaultProject": "frontend-iot"
+  }
 }

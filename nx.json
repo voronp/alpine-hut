@@ -22,24 +22,6 @@
       }
     }
   },
-  "projects": {
-    "api": {
-      "tags": []
-    },
-    "data-access": {
-      "tags": []
-    },
-    "frontend-iot": {
-      "tags": []
-    },
-    "frontend-iot-e2e": {
-      "tags": [],
-      "implicitDependencies": ["frontend-iot"]
-    },
-    "ui": {
-      "tags": []
-    }
-  },
   "targetDependencies": {
     "build": [
       {
@@ -47,5 +29,25 @@
         "projects": "dependencies"
       }
     ]
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/react"
+  },
+  "defaultProject": "frontend-iot",
+  "generators": {
+    "@nrwl/react": {
+      "application": {
+        "style": "scss",
+        "linter": "eslint",
+        "babel": true
+      },
+      "component": {
+        "style": "scss"
+      },
+      "library": {
+        "style": "scss",
+        "linter": "eslint"
+      }
+    }
   }
 }
