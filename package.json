@@ -38,7 +38,7 @@
     "@nestjs/platform-express": "^8.2.5",
     "@nestjs/schedule": "^1.0.2",
     "@nestjs/typeorm": "^8.0.2",
-    "@reduxjs/toolkit": "1.4.0",
+    "@reduxjs/toolkit": "1.8.2",
     "@types/react-redux": "7.1.11",
     "apollo-boost": "^0.4.9",
     "apollo-server-core": "3.6.1",
