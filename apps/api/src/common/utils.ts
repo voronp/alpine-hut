@@ -15,10 +15,10 @@ export function withCancel<T>(
   return asyncIterator;
 }
 
-export async function callUntilDone(fn:() => Promise<any>, timeout: number, tries: number) {
+export async function callUntilDone(fn:() => Promise<unknown>, timeout: number, tries: number) {
   if (!tries)
     return;
-  const delay = () => new Promise((res) => setTimeout(() => res(), timeout));
+  const delay = () => new Promise<void>((res) => setTimeout(() => res(), timeout));
   try {
     return fn();
   } catch (e) {
