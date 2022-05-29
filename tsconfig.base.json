@@ -16,9 +16,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@assets/*": ["apps/frontend-iot/src/assets/*"],
       "@home/data-access": ["libs/data-access/src/index.ts"],
-      "@home/ui": ["libs/ui/src/index.ts"],
-      "@assets/*": ["apps/frontend-iot/src/assets/*"]
+      "@home/ui": ["libs/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,10 +1,9 @@
+const { getJestProjects } = require('@nrwl/jest');
+
 module.exports = {
   projects: [
-    '<rootDir>/apps/frontend-iot',
+    ...getJestProjects(),
     '<rootDir>/apps/backend-iot',
-    '<rootDir>/apps/api',
-    '<rootDir>/libs/data-access',
-    '<rootDir>/libs/ui',
     '<rootDir>/libs/feature-peripherals/list',
   ],
 };

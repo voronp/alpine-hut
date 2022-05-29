@@ -23,6 +23,12 @@
     }
   },
   "projects": {
+    "api": {
+      "tags": []
+    },
+    "data-access": {
+      "tags": []
+    },
     "frontend-iot": {
       "tags": []
     },
@@ -30,14 +36,16 @@
       "tags": [],
       "implicitDependencies": ["frontend-iot"]
     },
-    "api": {
-      "tags": []
-    },
-    "data-access": {
-      "tags": []
-    },
     "ui": {
       "tags": []
     }
+  },
+  "targetDependencies": {
+    "build": [
+      {
+        "target": "build",
+        "projects": "dependencies"
+      }
+    ]
   }
 }
