@@ -6,7 +6,7 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import './app.scss';
 
-import {Route, Link, useHistory} from 'react-router-dom';
+import {Route, useHistory} from 'react-router-dom';
 
 import {PeripheralList} from './peripheral-list/peripheral-list';
 import {View3d} from './view3d/view3d';
@@ -66,7 +66,9 @@ export function App() {
         {
           authError ? <div>Please login</div> :
             loading ? <i className="pi pi-spin pi-spinner" style={{'fontSize': '2em'}}/> : <>
-              <Route path="/list" component={PeripheralList} />
+              <Route path="/list">
+                <PeripheralList />
+              </Route>
               <Route path="/view3d" children={({ match }) => (<View3d isActive={match && match.path === '/view3d' && !isModalOpened}/>)} />
             </>
         }
