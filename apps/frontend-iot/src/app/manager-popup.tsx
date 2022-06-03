@@ -31,7 +31,7 @@ export function ManagerPopup() {
   const {data: permissions, loading, error} = useAuthorizationDict(managerPopupItem?.ID)
   return isModalOpened && <Dialog
     breakpoints={{'960px': '75vw', '640px': '100vw'}}
-    style={{maxWidth: '800px'}}
+    style={{maxWidth: '800px', minWidth: '350px'}}
     header={managerPopupHeader}
     footer={<Button
       loading={isSaveLoading}

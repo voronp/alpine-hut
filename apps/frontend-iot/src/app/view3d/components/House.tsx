@@ -1,4 +1,4 @@
-import React, {useCallback, useState, useMemo, useRef, useEffect, forwardRef, MutableRefObject, useContext} from 'react';
+import React, {useCallback, useState, useMemo, useRef, useEffect, forwardRef, MutableRefObject, useContext, createRef} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Color3,
@@ -26,18 +26,18 @@ import { usePointer } from '../visualHooks';
 import * as Earcut from 'earcut';
 import {Corner, Wall, buildFromPlan} from "../utils3d";
 import {selectHovered, selectSelected} from "../../pointer.slice";
-import roof1Texture from '@assets/textures/TexturesCom_RooftilesTiles0005_1_seamless_S.jpg';
-import floor1Diff from '@assets/textures/TexturesCom_Wood_SidingOutdoor6_2x2_512_albedo.jpg';
-import floor1Normal from '@assets/textures/TexturesCom_Wood_SidingOutdoor6_2x2_512_normal.jpg';
-import wall1Normal from '@assets/textures/TexturesCom_Wood_SidingOutdoor6_2x2_512_normal.jpg';
-import wall1Diff from '@assets/textures/TexturesCom_WoodPlanksClean0087_1_seamless_S.jpg';
-import floor2Diff from '@assets/textures/TexturesCom_Wood_ParquetStrip6_512_albedo.jpg';
-import floor2Rough from '@assets/textures/TexturesCom_Wood_ParquetStrip6_512_roughness.jpg';
-import scifiDiff from '@assets/textures/TexturesCom_Scifi_Panel_512_albedo.jpg';
-import scifiNormal from '@assets/textures/TexturesCom_Scifi_Panel_512_normal.jpg';
-import brickDiff from '@assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512_albedo.jpg';
-import brickNormal from '@assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512_normal.jpg';
-import EnvTexture from '@assets/textures/TexturesCom_HDRPanorama182_1K_hdri_sphere_tone.jpg';
+import roof1Texture from '../../../assets/textures/TexturesCom_RooftilesTiles0005_1_seamless_S.jpg';
+import floor1Diff from '../../../assets/textures/TexturesCom_Wood_SidingOutdoor6_2x2_512_albedo.jpg';
+import floor1Normal from '../../../assets/textures/TexturesCom_Wood_SidingOutdoor6_2x2_512_normal.jpg';
+import wall1Normal from '../../../assets/textures/TexturesCom_Wood_SidingOutdoor6_2x2_512_normal.jpg';
+import wall1Diff from '../../../assets/textures/TexturesCom_WoodPlanksClean0087_1_seamless_S.jpg';
+import floor2Diff from '../../../assets/textures/TexturesCom_Wood_ParquetStrip6_512_albedo.jpg';
+import floor2Rough from '../../../assets/textures/TexturesCom_Wood_ParquetStrip6_512_roughness.jpg';
+import scifiDiff from '../../../assets/textures/TexturesCom_Scifi_Panel_512_albedo.jpg';
+import scifiNormal from '../../../assets/textures/TexturesCom_Scifi_Panel_512_normal.jpg';
+import brickDiff from '../../../assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512_albedo.jpg';
+import brickNormal from '../../../assets/textures/TexturesCom_Wall_BrickRed1_2.5x2.5_512_normal.jpg';
+import EnvTexture from '../../../assets/textures/TexturesCom_HDRPanorama182_1K_hdri_sphere_tone.jpg';
 import {SceneContext} from "react-babylonjs";
 import {OnPeripheralUpdatedDocument, Peripheral, usePeripheralGroupsBy3DPartLazyQuery} from "@home/data-access";
 import TreeNode from "primereact/treenode";
@@ -1037,7 +1037,10 @@ export const Fireplace = forwardRef<Mesh, {scene, reflectOthers}>(({scene, refle
 
 export function House({highlightLayer}) {
   const {scene} = useContext(SceneContext);
-  const partRefs = Object.values(meshIds).reduce((acc, v) => ({...acc, [v]: useRef(null)}), {});
+  const partRefs = useRef({});
+  Object.values(meshIds).forEach((v) => {
+    partRefs.current[v] = partRefs.current[v] ?? createRef();
+  });
   const selected = useSelector(selectSelected);
   const hovered = useSelector(selectHovered);
   const [selectedPart, setSelectedPart] = useState(null);
@@ -1048,8 +1051,8 @@ export function House({highlightLayer}) {
     subscribeToMore: subscribeToPeripheralGroupUpdate,
   }] = usePeripheralGroupsBy3DPartLazyQuery();
   const highlightMesh = (id:number) => {
-    if(id && partRefs[id].current && highlightLayer.current && !(highlightLayer.current as HighlightLayer).hasMesh(partRefs[id].current)) {
-      highlightLayer.current.addMesh(partRefs[id].current, Color3.Green());
+    if(id && partRefs.current[id].current && highlightLayer.current && !(highlightLayer.current as HighlightLayer).hasMesh(partRefs.current[id].current)) {
+      highlightLayer.current.addMesh(partRefs.current[id].current, Color3.Green());
     }
     if (!id) {
       (highlightLayer.current as HighlightLayer).removeAllMeshes();
@@ -1060,7 +1063,7 @@ export function House({highlightLayer}) {
       const sg = light.getShadowGenerator();
       if (sg) {
         sg.getShadowMap().refreshRate = 100;
-        Object.values(partRefs).forEach((ref) => {
+        Object.values(partRefs.current).forEach((ref) => {
           if ((ref as MutableRefObject<Mesh>).current) {
             (ref as MutableRefObject<Mesh>).current.receiveShadows = true;
             // (sg as ShadowGenerator).addShadowCaster((ref as MutableRefObject<Mesh>).current);
@@ -1080,9 +1083,9 @@ export function House({highlightLayer}) {
       setSelectedPart(selectPartMap[selected]);
     }
     Object.values(meshIds).forEach((meshId) => {
-      if (!partRefs[meshId].current)
+      if (!partRefs.current[meshId].current)
         return;
-      const mesh = partRefs[meshId].current as Mesh;
+      const mesh = partRefs.current[meshId].current as Mesh;
       // hide meshes configured as hidden for currently selected item
       if (selected && selectPartConfig[selectPartMap[selected]].hide.includes(meshId)) {
         mesh.isVisible = false;
@@ -1164,17 +1167,17 @@ export function House({highlightLayer}) {
   //const {isHovered} = usePointer('test', 'test2');
   //console.log(isHovered);
   return (<>
-    <Basement ref={partRefs[meshIds.basement]} scene={scene} />
-    <Floor1 ref={partRefs[meshIds.floor1]} scene={scene}/>
-    <Base2 ref={partRefs[meshIds.basement2]} scene={scene} />
-    <Floor2 ref={partRefs[meshIds.floor2]} scene={scene} />
-    <Base3 ref={partRefs[meshIds.basement3]} scene={scene} />
-    <Floor3 ref={partRefs[meshIds.floor3]} scene={scene} />
-    <BasementVeranda ref={partRefs[meshIds.basementVeranda]} scene={scene} />
-    <Veranda ref={partRefs[meshIds.veranda]} scene={scene}/>
-    <VerandaRoof ref={partRefs[meshIds.verandaRoof]} scene={scene}/>
-    <MainRoof ref={partRefs[meshIds.mainRoof]} scene={scene}/>
-    <Fireplace ref={partRefs[meshIds.fireplace]} scene={scene} reflectOthers={Object.values(partRefs)} />
+    <Basement ref={partRefs.current[meshIds.basement]} scene={scene} />
+    <Floor1 ref={partRefs.current[meshIds.floor1]} scene={scene}/>
+    <Base2 ref={partRefs.current[meshIds.basement2]} scene={scene} />
+    <Floor2 ref={partRefs.current[meshIds.floor2]} scene={scene} />
+    <Base3 ref={partRefs.current[meshIds.basement3]} scene={scene} />
+    <Floor3 ref={partRefs.current[meshIds.floor3]} scene={scene} />
+    <BasementVeranda ref={partRefs.current[meshIds.basementVeranda]} scene={scene} />
+    <Veranda ref={partRefs.current[meshIds.veranda]} scene={scene}/>
+    <VerandaRoof ref={partRefs.current[meshIds.verandaRoof]} scene={scene}/>
+    <MainRoof ref={partRefs.current[meshIds.mainRoof]} scene={scene}/>
+    <Fireplace ref={partRefs.current[meshIds.fireplace]} scene={scene} reflectOthers={Object.values(partRefs.current)} />
     <adtFullscreenUi name='ui1'>
     {peripheralGroupsBy3DPart && peripheralGroupsBy3DPart.getPeripheralGroupsBy3DPart.map((v, i) => (
         <Object3DLinkedInfo 

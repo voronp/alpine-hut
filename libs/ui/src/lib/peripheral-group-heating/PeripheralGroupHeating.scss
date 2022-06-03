@@ -1,0 +1,17 @@
+.peripheral-group-heating {
+    &> * {
+        margin-top: 10px;
+    }
+    &__temp-control {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
+    }
+    &__temp-label {
+        flex: 1 1 70%;
+    }
+    &__temp-input {
+        width: 70px;
+    }
+}

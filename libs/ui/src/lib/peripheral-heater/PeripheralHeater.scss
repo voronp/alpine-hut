@@ -1,0 +1,74 @@
+.peripheral-heater {
+    &__header {
+        font-size: 1.2em;
+    }
+    &__container {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: center;
+        min-height: 50px;
+        position: relative;
+    }
+    &__bulb {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        border-radius: 50%;
+        margin: 10px;
+        height: 20px;
+        width: 20px;
+        transform: scale(1);
+        &--active {
+            background: rgba(255, 82, 82, 1);
+            box-shadow: 0 0 0 0 rgba(255, 82, 82, 1);
+            animation: pulse-red 4s infinite;
+        }
+        &--inactive {
+            background: rgba(82, 82, 82, 0.5);
+            box-shadow: 0 0 0 10px rgba(82, 82, 82, 0.25);
+        }
+        i {
+            color: white;
+            font-size: 12px;
+            z-index: 1;
+        }
+    }
+    &__waver {
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        border-radius: 50%;
+        margin: 10px;
+        height: 20px;
+        width: 20px;
+        transform: scale(1);
+        background: rgba(255, 82, 82, 1);
+        box-shadow: 0 0 0 0 rgba(255, 82, 82, 1);
+        animation-name: pulse-red;
+        animation-duration: 4s;
+        animation-iteration-count: infinite;
+    }
+}
+
+
+@keyframes pulse-red {
+    0% {
+        transform: scale(0.95);
+        background: rgba(255, 82, 82, 0.7);
+        box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        background: rgba(255, 82, 82, 1);
+        box-shadow: 0 0 0 20px rgba(255, 82, 82, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        background: rgba(255, 82, 82, 0.7);
+        box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+    }
+}
