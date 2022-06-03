@@ -20,6 +20,7 @@ import skyposz from '@assets/textures/Meadow/posz.jpg';
 /* eslint-disable-next-line */
 export interface View3dProps {
   isActive: boolean, // doesn't work yet, will be available in next babylonjs build (supposed to stor render if true)
+  isHidden: boolean,
 }
 
 let scene = null;
@@ -55,8 +56,12 @@ export function View3d(props: View3dProps) {
   const engineRef = useCallback((eng) => {
     console.log('eng', eng);
   }, []);
+  const style:{[k:string] : string} = {
+    display: props.isHidden ? 'none' : 'block',
+  };
+  if (!props.isActive) style.filter = 'blur(5px)';
   return (
-    <div className={styles.wrapper} style={!props.isActive ? {filter: 'blur(5px)'} : {}}>
+    <div className={styles.wrapper} style={style}>
       <Engine ref={engineRef} antialias canvasId='babylonJS' adaptToDeviceRatio={true} canvasStyle={{width: '100%', height: '100%'}} >
         <Scene onSceneMount={onSceneMounted}>
           <highlightLayer ref={highlightLayerEL} name="highlight"/>
