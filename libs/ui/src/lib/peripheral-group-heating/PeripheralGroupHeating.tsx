@@ -35,7 +35,7 @@ export function PeripheralGroupHeating({access, data, onEnable, onUpdateData}: P
       <InputSwitch disabled={!access.Activate} checked={data.Data.IsActive} onChange={(e) => onEnable(e.value)} />
       <Divider style={{width: '100%'}}/>
       <div className="grid">
-          <div className="col-12 md:col-5 flex align-items-center justify-content-center">
+          <div className="col-12 md:col-5 flex align-items-stretch justify-content-center">
               <PeripheralTemperatureSensor
                 Name={temperatureSensorData.Name}
                 Temperature={temperatureSensorData.Data.Temperature}
@@ -46,7 +46,7 @@ export function PeripheralGroupHeating({access, data, onEnable, onUpdateData}: P
                   <i className='pi pi-arrows-h'/>
               </Divider>
           </div>
-          <div className="col-12 md:col-5 flex align-items-center justify-content-center">
+          <div className="col-12 md:col-5 flex align-items-stretch justify-content-center">
             <PeripheralHeater
               IsActive={!!heaterData.IsActive}
               Name={heaterData.Name}

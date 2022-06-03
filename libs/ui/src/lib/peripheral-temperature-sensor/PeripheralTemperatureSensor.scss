@@ -1,0 +1,16 @@
+.peripheral-temperature-sensor {
+    display: flex;
+    flex-flow: column;
+    justify-content: stretch;
+    &__header {
+        font-size: 1.2em;
+        height: 20px;
+    }
+    &__container {
+        flex: 1 1 auto;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: center;
+    }
+}
