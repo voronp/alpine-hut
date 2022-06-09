@@ -1,0 +1,17 @@
+.container {
+    &> * {
+        margin-top: 10px;
+    }
+}
+.control {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+.label {
+    flex: 1 1 70%;
+}
+.input {
+    width: 70px;
+}

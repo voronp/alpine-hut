@@ -3,9 +3,13 @@ import React, { ReactNode, useCallback } from 'react';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { BlockUI } from 'primereact/blockui';
 import { Tag } from 'primereact/tag';
-import { ProgressSpinner } from 'primereact/progressspinner'
+import { ProgressSpinner } from 'primereact/progressspinner';
+import { Message } from 'primereact/message';
 import { PeripheralGroup } from '@home/data-access';
-import styles from './PeripheralListAccordion.module.scss'
+import { PeripheralGroupHeating } from '@home/ui';
+import { useAuthorizationDict } from '../hooks/common';
+import styles from './PeripheralListAccordion.module.scss';
+import PeripheralListAccordionItem from './PeripheralListAccordionItem';
 
 export interface PeripheralListAccProps {
   loading:boolean
@@ -32,12 +36,14 @@ export function PeripheralListAccordion(props: PeripheralListAccProps) {
     e.originalEvent.preventDefault();
     onSelect(e.index ? items[e.index-1]?.ID : undefined); // index in accordion starts from 1
   }, [onSelect, items]);
+  const {data: permissions, loading: permissionsLoading, error: permissionsError} = useAuthorizationDict(selectedID);
   return (<Accordion activeIndex={selectedIndex} onTabChange={onSelectTab}>
     { loading && <BlockUI blocked template={<ProgressSpinner/>} /> }
     { !loading && items.map(v => (
       <AccordionTab key={v.ID} header={<AccHeader {...v}/>}>
-        <p>{ JSON.stringify(v) }
-        </p>
+        { permissionsLoading && <ProgressSpinner/>}
+        { permissionsError && <Message severity="error" text="Permissions error" /> }
+        { permissions && permissions.Read && <PeripheralListAccordionItem PeripheralGroupID={v.ID}/> }
       </AccordionTab>
     )) }
   </Accordion>);

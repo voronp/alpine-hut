@@ -66,7 +66,7 @@ export function App() {
         {
           authError ? <div>Please login</div> :
             loading ? <i className="pi pi-spin pi-spinner" style={{'fontSize': '2em'}}/> : <>
-              <Route path="/view3d" children={({ match }) => (<View3d isActive={match && match.path === '/view3d' && !isModalOpened} isHidden={!match || match.path !== '/view3d'}/>)} />
+              <Route path="/view3d" children={({ match }) => (<div/>)} />
               <Route path="/list">
                 <PeripheralList />
               </Route>

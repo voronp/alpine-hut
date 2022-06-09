@@ -4,6 +4,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Panel } from 'primereact/panel';
 import { AuthorizationDict, PeripheralGroupHeating } from '@home/ui';
 import { useUpdatePeripheralGroupMutation, useActivatePeripheralGroupMutation, useDeactivatePeripheralGroupMutation } from '@home/data-access';
+import { setOptToObj } from '@home/util';
 
 const getPeripheralGroupComponent = (componentName:string) => {
   if (componentName === 'heating_system') return PeripheralGroupHeating;
@@ -44,15 +45,6 @@ export function PeripheralGroupForm (props: {
     v ? await activatePeripheralGroup({variables: {ID: props.data.ID}}) : await deactivatePeripheralGroup({variables: {ID: props.data.ID}});
   }
   const onUpdate = (v:{[k:string]: string|number}) => {
-    const setOptToObj = (obj, parts, val) => {
-      const part = parts.shift();
-      if (!parts.length) {
-        obj[part] = val;
-        return;
-      }
-      obj[part] = {};
-      setOptToObj(obj[part], parts, val);
-    }
     const mergedPG = Object.entries(v).reduce((acc, [key, val]) => {
       const parts = key.split('.');
       setOptToObj(acc, parts, val);
