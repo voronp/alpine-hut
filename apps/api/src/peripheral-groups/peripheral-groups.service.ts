@@ -80,6 +80,7 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
         });
       } else pg[k] = v;
     })
+    if (this.serverState.activePeripheralGroups[pg.ID]) this.serverState.setPeripheralGroupActive(pg);
     return this.peripheralGroupRepository.save(pg);
   }
 
