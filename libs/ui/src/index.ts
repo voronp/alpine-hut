@@ -1,3 +1,7 @@
+export * from './lib/peripheral/PeripheralInfo';
+export * from './lib/peripheral/PeripheralAdmin';
+export * from './lib/peripheral-temperature-sensor/PeripheralTemperatureSensorAdmin';
+export * from './lib/peripheral-heater/PeripheralHeaterAdmin';
 export * from './lib/peripheral-group-heating/PeripheralGroupHeatingAdmin';
 export * from './lib/peripheral-group-heating/PeripheralGroupHeatingInfo';
 export * from './lib/peripheral-temperature-sensor/PeripheralTemperatureSensor';
