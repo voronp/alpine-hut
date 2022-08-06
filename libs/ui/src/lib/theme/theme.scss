@@ -1,0 +1,9 @@
+.theme {
+    &-wide {
+        width: 100%;
+        min-width: 300px;
+    }
+    &-label-cell {
+        padding-top: 1rem;
+    }
+}
