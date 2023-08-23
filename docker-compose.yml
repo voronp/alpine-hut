@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  hut-postgres:
+    image: postgres:14-alpine
+    container_name: hut-postgres
+    environment:
+      POSTGRES_PASSWORD: pgpass
+      POSTGRES_DB: alpinehut_db
+    hostname: hut-postgres
+    restart: unless-stopped
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data:rw
+    ports:
+      - "15432:5432"
+    networks:
+      - hut

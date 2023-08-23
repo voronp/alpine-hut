@@ -42,3 +42,6 @@ Thumbs.db
 previous/
 
 test*
+
+/data/postgres
+/data/mysql

@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  hut-postgres:
+    image: postgres:14-alpine
+    container_name: hut-postgres
+    environment:
+      POSTGRES_PASSWORD: pgpass
+      POSTGRES_DB: alpinehut_db
+    hostname: hut-postgres
+    restart: unless-stopped
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data:rw
+    ports:
+      - "15432:5432"
+    networks:
+      - hut
+  hut-mysql:
+    image: mysql:5-debian
+    container_name: hut-mysql
+    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
+    command: --default-authentication-plugin=mysql_native_password
+    hostname: hut-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: mysqlpass
+    volumes:
+      - ./data/mysql:/var/lib/mysql:rw
+    ports:
+      - "13306:3306"
+    networks:
+      - hut
+  hut-pgloader:
+    image: dimitri/pgloader:latest
+    container_name: hut-pgloader
+    command: pgloader mysql://root:mysqlpass@hut-mysql/alpinehut_db pgsql://postgres:pgpass@hut-postgres/alpinehut_db
+    networks:
+      - hut
+    depends_on:
+      - hut-postgres
+      - hut-mysql
+networks:
+  hut:
+    external: true
