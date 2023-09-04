@@ -2,10 +2,10 @@ export const environment = {
   production: false,
   database: {
     connectionLimit : 10,
-    host     : '127.0.0.1',
-    port     : 3306,
-    user     : 'root',
-    password : '123123',
+    host     : 'hut-postgres',
+    port     : 5432,
+    user     : 'postgres',
+    password : 'pgpass',
     database : 'alpinehut_db'
   },
   sessionSecret: "qAwertd0hyuiop_12355445ererh67vbvF89",

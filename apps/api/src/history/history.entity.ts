@@ -35,7 +35,7 @@ export class History {
   @Column("simple-json")
   Data: Record<string, unknown>;
 
-  @Column({type: 'datetime'})
+  @Column({type: 'timestamp'})
   Created: Date;
 }
 

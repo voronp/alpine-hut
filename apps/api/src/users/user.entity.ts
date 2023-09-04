@@ -31,7 +31,7 @@ export class User {
   })
   Role: UserRole;
 
-  @Column({type: "tinyint"})
+  @Column({type: "int2"})
   Status: number;
 
   @Column()

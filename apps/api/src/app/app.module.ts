@@ -25,7 +25,7 @@ import { ProfilesModule } from '../profiles/profiles.module';
   imports: [
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'postgres',
       host: environment.database.host,
       port: environment.database.port,
       username: environment.database.user,

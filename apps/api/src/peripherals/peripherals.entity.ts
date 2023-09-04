@@ -30,7 +30,7 @@ export class Peripheral {
   @Column("simple-json")
   Data: Record<string, unknown>;
 
-  @Column({type: "tinyint"})
+  @Column({type: "int2"})
   IsActive: boolean;
 
   @Column({
@@ -50,7 +50,7 @@ export class Peripheral {
   @Column()
   Description: string;
 
-  @Column({type: 'datetime'})
+  @Column({type: 'timestamp'})
   LastUpdate: Date;
 
   @Column({type: 'json'})

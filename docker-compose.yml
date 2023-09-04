@@ -14,3 +14,24 @@ services:
       - "15432:5432"
     networks:
       - hut
+  hut-nx:
+    build:
+      context: .
+      target: base-hut
+    environment:
+      POSTGRES_PASSWORD: pgpass
+      POSTGRES_DB: alpinehut_db
+    container_name: hut-nx
+    entrypoint: ["/www/entrypoint-dev.sh"]
+    volumes:
+      - .:/www:delegated
+    ports:
+      - 4200:4200
+      - 3333:3333
+    networks:
+      - hut
+    depends_on:
+      - hut-postgres
+networks:
+  hut:
+    external: true
