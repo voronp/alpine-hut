@@ -1,6 +1,6 @@
 FROM node:18-alpine as base-hut
 
-RUN apk add g++ make py3-pip
+RUN apk add g++ make py3-pip curl
 
 WORKDIR /www
 
@@ -30,7 +30,6 @@ RUN yarn install
 RUN npx ts-node generate-gql-typings.ts
 RUN npx graphql-codegen --config=./libs/data-access/codegen.yml
 
-EXPOSE 4200
-EXPOSE 3333
+EXPOSE 4200 3333 9229
 
 CMD ["npx", "nx", "run-many", "--parallel", "--target=serve", "--all"]

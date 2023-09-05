@@ -21,13 +21,15 @@ services:
     environment:
       POSTGRES_PASSWORD: pgpass
       POSTGRES_DB: alpinehut_db
+      DEV_PLATFORM: DOCKER
     container_name: hut-nx
     entrypoint: ["/www/entrypoint-dev.sh"]
     volumes:
       - .:/www:delegated
     ports:
-      - 4200:4200
-      - 3333:3333
+      - "4200:4200"
+      - "3333:3333"
+      - "9229:9229"
     networks:
       - hut
     depends_on:
