@@ -87,3 +87,12 @@ npx ts-node generate-gql-typings.ts
 ```$xslt
 npx graphql-codegen --config=./libs/data-access/codegen.yml 
 ```
+
+### dump database
+
+```
+docker exec -ti hut-postgres /bin/sh
+pg_dump -c -C -O --if-exists --inserts --on-conflict-do-nothing -U postgres -h hut-postgres alpinehut_db -W > /home/dump.sql
+exit
+docker cp hut-postgres:/home/dump.sql dump-pg-full.sql
+```
