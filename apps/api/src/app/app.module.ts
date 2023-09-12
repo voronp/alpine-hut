@@ -39,7 +39,7 @@ import { ProfilesModule } from '../profiles/profiles.module';
       //synchronize: true,
     }),
     GraphQLModule.forRoot({
-      typePaths: ['./**/*.graphql'],
+      typePaths: ['../**/*.graphql'],
       resolvers: {
         JSON: GraphQLJSON,
       },

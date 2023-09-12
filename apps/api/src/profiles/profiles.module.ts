@@ -5,6 +5,7 @@ import { Profile } from './profile.entity';
 import { ProfilesResolver } from './profiles.resolver';
 import { ProfileAuthorizationsModule } from '../profile-authorizations/profile-authorizations.module';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 @Module({
   imports: [
