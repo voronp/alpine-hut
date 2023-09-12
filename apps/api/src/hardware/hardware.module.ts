@@ -3,6 +3,8 @@ import { Hardware } from './hardware';
 import { StubHardware } from './stub-hardware';
 import { AbstractHardware } from './abstract-hardware';
 
+console.log(process.env.NODE_ENV, process.env.NODE_ENV === 'development');
+
 const hardwareProvider = {
   provide: AbstractHardware,
   useClass:
