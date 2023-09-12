@@ -22,6 +22,7 @@ services:
       POSTGRES_PASSWORD: pgpass
       POSTGRES_DB: alpinehut_db
       DEV_PLATFORM: DOCKER
+      USE_STUB_HARDWARE: true
     container_name: hut-nx
     entrypoint: ["/www/entrypoint-dev.sh"]
     volumes:
