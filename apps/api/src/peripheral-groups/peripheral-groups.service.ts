@@ -96,7 +96,7 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
         // find all peripherals that should be set to initial level (like relay)
         if (p.Type === PeripheralType.HEATER) {
           // open heater pin for write on initial level
-          const initialLevel:string = p.Data.Active === AbstractHardware.HIGH ? AbstractHardware.LOW : AbstractHardware.HIGH;
+          const initialLevel:string = p.Data.Active === 'LOW' ? AbstractHardware.HIGH : AbstractHardware.LOW;
           this.hardwareProvider.openPIO(p.Data.Pin as number, AbstractHardware.OUTPUT, initialLevel);
         }
       });
