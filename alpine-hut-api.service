@@ -1,0 +1,16 @@
+[Unit]
+Description=Manage Alpine Hut API
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+WorkingDirectory=/home/www/alpine-hut
+ExecStart=/usr/local/bin/node /home/www/alpine-hut/dist/apps/api/main.js
+User=www
+Type=simple
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
