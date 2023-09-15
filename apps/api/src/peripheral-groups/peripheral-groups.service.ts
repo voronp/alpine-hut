@@ -205,7 +205,7 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
         // log invalid configuration
         throw new Error('Configuration is invalid, please update');
       }
-      const deactivateHeaterMethod:string = heaterPeripheral.Data.Active === AbstractHardware.HIGH ? 'setLowPIO' : 'setHighPIO';
+      const deactivateHeaterMethod:string = heaterPeripheral.Data.Active === 'LOW' ? 'setHighPIO' : 'setLowPIO';
       this.hardwareProvider[deactivateHeaterMethod](heaterPeripheral.Data.Pin);
       heaterPeripheral.IsActive = false;
       await this.savePeripheral(heaterPeripheral);
