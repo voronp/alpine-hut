@@ -1,10 +1,17 @@
 import { PeripheralGroup } from "../peripheral-groups/peripheral-group.entity";
+import { Peripheral } from "../peripherals/peripherals.entity";
 
 export class ServerState {
   subscribed = {};
-  activePeripheralGroups = {};
+  allPeripheralGroups:PeripheralGroup[] = [];
+  inactivePeripheralTicks:Record<string, number>  = {};
+  activePeripheralGroups:Record<string, PeripheralGroup> = {};
   activePeripheralGroupTicks = {};
   processingPeripheralGroups = {};
+
+  setAllPeripheralGroups(pgList: PeripheralGroup[]) {
+    this.allPeripheralGroups = pgList;
+  }
 
   setPeripheralGroupActive(pg: PeripheralGroup) {
     this.activePeripheralGroups[pg.ID] = pg;
@@ -38,5 +45,23 @@ export class ServerState {
       }
     });
     return res;
+  }
+
+  getInactivePeripheralsOnTick() {
+    const activePeripheralIds:Record<string, boolean> = {};
+    Object.values(this.activePeripheralGroups).forEach(pg => pg.Peripherals.forEach(p => {
+      activePeripheralIds[p.ID] = true;
+    }));
+    const inactivePeripherals:Peripheral[] = [];
+    this.allPeripheralGroups.forEach(pg => pg.Peripherals.forEach(p => {
+      if (activePeripheralIds[p.ID]) return;
+      if (!(p.ID in this.inactivePeripheralTicks)) this.inactivePeripheralTicks[p.ID] = 0;
+      this.inactivePeripheralTicks[p.ID] += 1;
+      if (this.inactivePeripheralTicks[p.ID] === (p.Data.PeriodInactiveCheck || 60)) {
+        this.inactivePeripheralTicks[p.ID] = 0;
+        inactivePeripherals.push(p);
+      }
+    }));
+    return inactivePeripherals;
   }
 }

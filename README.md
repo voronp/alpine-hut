@@ -96,3 +96,13 @@ pg_dump -c -C -O --if-exists --inserts --on-conflict-do-nothing -U postgres -h h
 exit
 docker cp hut-postgres:/home/dump.sql dump-pg-full.sql
 ```
+change owner of all tables
+```
+SELECT format(
+          'ALTER TABLE alpinehut_db.%I OWNER TO alpinehut_user',
+          table_name
+       )
+FROM information_schema.tables
+WHERE table_schema = 'alpinehut_db'
+  AND table_type = 'BASE TABLE' \gexec
+```

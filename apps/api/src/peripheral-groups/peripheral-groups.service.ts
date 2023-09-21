@@ -112,14 +112,44 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
         }
       }
     });
+    this.serverState.setAllPeripheralGroups(peripheralGroups);
     const interval = setInterval(() => this.ticker(), 1000);
     this.schedulerRegistry.addInterval(this.intervalName, interval);
   }
 
   async ticker() {
+    const getTemperature = async (id:string, tries:number) => {
+      try {
+        return await this.hardwareProvider.getTemperature(id);
+      } catch(e) {
+        tries --;
+        if (tries) return await getTemperature(id, tries);
+        throw e;
+      }
+    };
     this.serverState.getActivePeripheralGroupsOnTick().forEach(async pg => {
-      await this.processActivePeripheralGroup(pg);
-    })
+      try {
+        await this.processActivePeripheralGroup(pg);
+      } catch(e) {
+        console.error('Error in active ticker', e);
+      }
+    });
+    this.serverState.getInactivePeripheralsOnTick().forEach(async p => {
+      if (p.Type === PeripheralType.SENSOR) {
+        // update sensor data
+        try {
+          const temperature = await getTemperature(p.Data.DeviceID as string, 3);
+          await this.historyService.addForPeripheral(p.ID, {
+            Action: HistoryActions.Measure,
+            Value: temperature,
+          });
+          p.Data.Temperature = temperature;
+          await this.savePeripheral(p);
+        } catch (e) {
+          console.error('Error in inactive ticker', e);
+        }
+      }
+    });
   }
 
   resetPeripheralGroup(pg:PeripheralGroup) {
@@ -172,13 +202,12 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
         }
       } catch(e) {
         // log sensor fail, shutdown heater
-        console.error(e);
         await this.deactivatePeripheralGroup(pg);
         await this.historyService.addForPeripheralGroup(pg.ID, {
           Action: HistoryActions.Deactivate,
           Reason: HistoryReasons.Malfunction,
         });
-        throw new Error('Sensor malfunction');
+        throw new Error(`Sensor malfunction: ${e}`);
       }
       try {
         await this.savePeripheral(sensorPeripheral);
@@ -192,10 +221,14 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
   }
 
   async activatePeripheralGroup(pg:PeripheralGroup) {
+    try {
     this.serverState.setPeripheralGroupActive(pg);
     pg.Data.IsActive = true;
     await this.processActivePeripheralGroup(pg);
     await this.peripheralGroupRepository.save(pg);
+    } catch(e) {
+      console.error('Error in activatePeripheralGroup', e);
+    }
   }
 
   async deactivatePeripheralGroup(pg:PeripheralGroup) {
