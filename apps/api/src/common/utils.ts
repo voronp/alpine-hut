@@ -20,7 +20,7 @@ export async function callUntilDone(fn:() => Promise<unknown>, timeout: number, 
     return;
   const delay = () => new Promise<void>((res) => setTimeout(() => res(), timeout));
   try {
-    return fn();
+    return await fn();
   } catch (e) {
     await delay();
     return callUntilDone(fn, timeout, tries-1);

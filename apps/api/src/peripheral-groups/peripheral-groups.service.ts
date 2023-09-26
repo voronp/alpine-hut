@@ -207,6 +207,7 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
           Action: HistoryActions.Deactivate,
           Reason: HistoryReasons.Malfunction,
         });
+        this.serverState.unsetPeripheralGroupProcessisng(pg);
         throw new Error(`Sensor malfunction: ${e}`);
       }
       try {
@@ -222,10 +223,10 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
 
   async activatePeripheralGroup(pg:PeripheralGroup) {
     try {
-    this.serverState.setPeripheralGroupActive(pg);
-    pg.Data.IsActive = true;
-    await this.processActivePeripheralGroup(pg);
-    await this.peripheralGroupRepository.save(pg);
+      this.serverState.setPeripheralGroupActive(pg);
+      pg.Data.IsActive = true;
+      await this.processActivePeripheralGroup(pg);
+      await this.peripheralGroupRepository.save(pg);
     } catch(e) {
       console.error('Error in activatePeripheralGroup', e);
     }
