@@ -118,15 +118,6 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
   }
 
   async ticker() {
-    const getTemperature = async (id:string, tries:number) => {
-      try {
-        return await this.hardwareProvider.getTemperature(id);
-      } catch(e) {
-        tries --;
-        if (tries) return await getTemperature(id, tries);
-        throw e;
-      }
-    };
     this.serverState.getActivePeripheralGroupsOnTick().forEach(async pg => {
       try {
         await this.processActivePeripheralGroup(pg);
@@ -138,11 +129,12 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
       if (p.Type === PeripheralType.SENSOR) {
         // update sensor data
         try {
-          const temperature = await getTemperature(p.Data.DeviceID as string, 3);
+          const temperature = await callUntilDone(() => this.hardwareProvider.getTemperature(p.Data.DeviceID as string), 1000, 5);
           await this.historyService.addForPeripheral(p.ID, {
             Action: HistoryActions.Measure,
             Value: temperature,
           });
+          if (temperature === undefined) return;
           p.Data.Temperature = temperature;
           await this.savePeripheral(p);
         } catch (e) {
@@ -181,7 +173,7 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
           throw e;
         });
       try {
-        const temperature = await getTemperature(sensorPeripheral.Data.DeviceID as string, 3);
+        const temperature = await getTemperature(sensorPeripheral.Data.DeviceID as string, 5);
         await this.historyService.addForPeripheral(sensorPeripheral.ID, {
           Action: HistoryActions.Measure,
           Value: temperature,
@@ -203,6 +195,17 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
         }
       } catch(e) {
         // log sensor fail, shutdown heater
+        this.hardwareProvider[deactivateHeaterMethod](heaterPeripheral.Data.Pin);
+        heaterPeripheral.IsActive = false;
+        await this.historyService.addForPeripheral(heaterPeripheral.ID, {
+          Action: HistoryActions.Deactivate,
+          Reason: HistoryReasons.Malfunction,
+        });
+        await this.historyService.addForPeripheral(sensorPeripheral.ID, {
+          Action: HistoryActions.Measure,
+          Value: undefined,
+        });
+        /*
         await this.deactivatePeripheralGroup(pg);
         await this.historyService.addForPeripheralGroup(pg.ID, {
           Action: HistoryActions.Deactivate,
@@ -210,6 +213,7 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
         });
         this.serverState.unsetPeripheralGroupProcessisng(pg);
         throw new Error(`Sensor malfunction: ${e}`);
+        */
       }
       try {
         await this.savePeripheral(sensorPeripheral);
