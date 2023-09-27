@@ -176,7 +176,8 @@ export class PeripheralGroupsService implements OnApplicationBootstrap {
         .getTemperature(id)
         .catch((e) => {
           tries--;
-          if(tries) return getTemperature(id, tries);
+          console.warn(`getTemperature(${id}, ${tries}) fails`);
+          if(tries) return new Promise((res) => setTimeout(() => res(getTemperature(id, tries)), 1000));
           throw e;
         });
       try {
