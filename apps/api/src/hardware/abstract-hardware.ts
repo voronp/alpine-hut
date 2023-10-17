@@ -15,4 +15,7 @@ export class AbstractHardware {
   async getTemperature(id:string):Promise<number> {
     return 999;
   }
+  async getWaterLevel():Promise<number> {
+    return 0.5;
+  }
 }

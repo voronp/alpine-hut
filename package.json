@@ -52,6 +52,7 @@
     "graphql-tools": "^7.0.2",
     "graphql-type-json": "^0.3.2",
     "graphql-ws": "^5.5.5",
+    "modbus-serial": "^8.0.13",
     "mysql": "^2.18.1",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
