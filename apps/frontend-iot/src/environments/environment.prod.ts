@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  gqlUrl: 'http://192.168.1.33:3333/graphql',
-  wsUrl: 'ws://192.168.1.33:3333/graphql',
-  httpUrl: 'http://192.168.1.33:3333',
+  gqlUrl: 'http://'+window.location.hostname+':3333/graphql',
+  wsUrl: 'ws://'+window.location.hostname+':3333/graphql',
+  httpUrl: 'http://'+window.location.hostname+':3333',
 };
